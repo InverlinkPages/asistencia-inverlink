@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asistencia Junio 2026 - Inverlink</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a}
+.header{background:#1a1a2e;color:#fff;padding:1.2rem 2rem;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:1.1rem;font-weight:500}.header a{color:#aac4ff;font-size:.85rem;text-decoration:none}
+.container{max-width:1200px;margin:0 auto;padding:1.2rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.2rem}
+.kpi{background:#fff;border-radius:8px;padding:1rem;border:1px solid #e5e5e5}
+.kpi-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.kpi-val{font-size:26px;font-weight:600;color:#1a1a2e}.kpi-sub{font-size:11px;color:#aaa;margin-top:2px}
+.tabs{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:6px;font-size:13px;cursor:pointer;border:1px solid #e0e0e0;background:#fff;color:#666}
+.tab.active{background:#1a1a2e;color:#fff;border-color:#1a1a2e}
+.panel{display:none}.panel.active{display:block}
+.card{background:#fff;border-radius:8px;padding:1.2rem;border:1px solid #e5e5e5;margin-bottom:1.2rem}
+.filters{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+input,select{padding:7px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none}
+input{flex:1;min-width:180px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 12px;color:#888;font-weight:500;border-bottom:1px solid #f0f0f0;font-size:11px;text-transform:uppercase}
+td{padding:9px 12px;border-bottom:1px solid #f9f9f9}tr:hover td{background:#fafafa}
+.bar-bg{background:#f0f0f0;border-radius:4px;height:5px;width:90px;display:inline-block;vertical-align:middle}
+.bar-fill{height:5px;border-radius:4px}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600}
+.bg{background:#e1f5ee;color:#0f6e56}.ba{background:#faeeda;color:#854f0b}.br{background:#fcebeb;color:#a32d2d}
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+.emp-card{background:#fff;border-radius:8px;padding:1rem;border:1px solid #e5e5e5}
+.emp-name{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:4px}
+.emp-stats{font-size:11px;color:#888;margin-bottom:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.cal-h{font-size:9px;color:#aaa;text-align:center;padding:2px 0;font-weight:600}
+.cal-d{border-radius:3px;padding:3px 1px;text-align:center;font-size:10px;font-weight:500;min-height:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;cursor:default}
+.cal-d.empty{background:transparent}.cal-d.si{background:#e1f5ee;color:#0f6e56}
+.cal-d.no{background:#fcebeb;color:#a32d2d;cursor:pointer}.cal-d.no:hover{background:#f5c6c6}
+.cal-d.justificado{background:#e6f0ff;color:#1a5dc8;cursor:pointer}
+.cal-d.finde,.cal-d.festivo{background:#f5f5f5;color:#ccc}
+.cal-d .hora{font-size:7.5px;font-weight:400;opacity:.85}
+.legend{display:flex;gap:12px;margin-bottom:1rem;font-size:12px;color:#666;flex-wrap:wrap}
+.ldot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
+.modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:12px;padding:1.5rem;width:400px;max-width:90%}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:.5rem;color:#1a1a2e}
+.modal p{font-size:13px;color:#888;margin-bottom:1rem}
+.modal input{width:100%;margin-bottom:.5rem}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem}
+.btn{padding:8px 16px;border-radius:6px;font-size:13px;cursor:pointer;border:none;font-weight:500}
+.btn-primary{background:#1a1a2e;color:#fff}.btn-secondary{background:#f0f0f0;color:#666}
+.btn-danger{background:#fcebeb;color:#a32d2d}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1a2e;color:#fff;padding:.8rem 1.2rem;border-radius:8px;font-size:13px;z-index:2000;display:none}
+.toast.show{display:block}
+.sem-title{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.06em;margin:1.2rem 0 8px}
+.sem-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:1.5rem;overflow-x:auto;display:block}
+.sem-table th{padding:5px 3px;text-align:center;font-weight:500;color:#888;border-bottom:1px solid #f0f0f0;font-size:10px;white-space:nowrap}
+.sem-table th.nm{text-align:left;min-width:130px}
+.sem-table th.sh{background:#f9f9f9;border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0}
+.sem-table td{padding:4px 3px;text-align:center;border-bottom:1px solid #f9f9f9}
+.sem-table td.nm{text-align:left;font-size:12px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.sem-table td.sh{background:#f9f9f9;border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0;font-size:11px;font-weight:500}
+.dot{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:500}
+.d-si{background:#e1f5ee;color:#0f6e56}.d-no{background:#fcebeb;color:#a32d2d}
+.d-ju{background:#e6f0ff;color:#1a5dc8}.d-fi{background:#f5f5f5;color:#ccc}
+.c-g{color:#0f6e56;font-weight:500}.c-a{color:#854f0b;font-weight:500}.c-r{color:#a32d2d;font-weight:500}
+@media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.tabs2{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap}
+.tab2{padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #e0e0e0;background:#fff;color:#666}
+.tab2.active{background:#264E84;color:#fff;border-color:#264E84}
+.fds-panel{display:none}.fds-panel.active{display:block}
+.card{background:#fff;border-radius:8px;padding:1.2rem;border:1px solid #e5e5e5;margin-bottom:1.2rem}
+.card-title{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.8rem}
+.fds-tbl{width:100%;border-collapse:collapse;font-size:12px;overflow-x:auto;display:block}
+.fds-tbl th{padding:5px 6px;text-align:center;font-weight:500;color:#888;border-bottom:1px solid #f0f0f0;font-size:10px;white-space:nowrap}
+.fds-tbl th.nm{text-align:left;min-width:140px}
+.fds-tbl td{padding:4px 4px;text-align:center;border-bottom:1px solid #f9f9f9}
+.fds-tbl td.nm{text-align:left;font-size:12px;color:#1a1a1a;padding-left:2px;white-space:nowrap}
+.fds-tbl tr:hover td{background:#fafafa}
+.hcell{min-width:40px;height:22px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:500}
+.h0{background:#f5f5f5;color:#aaa}.hg{background:#e8f5e9;color:#1B7A3E}
+.ha{background:#fff3cd;color:#856404}.hr{background:#fcebeb;color:#C0392B}.hrr{background:#C0392B;color:#fff}
+.kpi-fds{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.2rem}
+.kpi-fds .kpi{background:#f9f9f9}
+
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Asistencia Junio 2026 &mdash; Inverlink S.A.S</h1>
+  <a href="index.html">← Ver todos los meses</a>
+</div>
+<div class="container">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Empleados</div><div class="kpi-val">46</div><div class="kpi-sub">Junio 2026</div></div>
+    <div class="kpi"><div class="kpi-label">Días hábiles</div><div class="kpi-val">4</div><div class="kpi-sub">lun–vie del mes</div></div>
+    <div class="kpi"><div class="kpi-label">Mejor asistencia</div><div class="kpi-val">100.0%</div><div class="kpi-sub">máximo del mes</div></div>
+    <div class="kpi"><div class="kpi-label">Promedio días</div><div class="kpi-val">2.4</div><div class="kpi-sub">por empleado</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="sw(this,'resumen')">Resumen</button>
+    <button class="tab" onclick="sw(this,'semanal')">Informe semanal</button>
+    <button class="tab" onclick="sw(this,'calendario')">Calendario</button>
+    <button class="tab" onclick="sw(this,'dias')">Por día</button>
+    <button class="tab" onclick="sw(this,'fds')">FDS</button>
+  </div>
+
+  <div id="tab-resumen" class="panel active">
+    <div class="filters">
+      <input type="text" id="sRes" placeholder="Buscar empleado..." oninput="fRes()"/>
+      <select id="oRes" onchange="fRes()">
+        <option value="a">Más asistencias</option>
+        <option value="au">Más ausencias</option>
+        <option value="n">Nombre A-Z</option>
+      </select>
+    </div>
+    <table><thead><tr><th>Empleado</th><th>Asistencias</th><th>Ausencias</th><th>% asistencia</th><th>Estado</th></tr></thead>
+    <tbody id="rBody"></tbody></table>
+  </div>
+
+  <div id="tab-semanal" class="panel">
+    <div class="legend">
+      <span><span class="ldot" style="background:#e1f5ee;border:1px solid #1D9E75"></span>Asistió</span>
+      <span><span class="ldot" style="background:#fcebeb;border:1px solid #E24B4A"></span>Ausente</span>
+      <span><span class="ldot" style="background:#e6f0ff;border:1px solid #1a5dc8"></span>Justificado</span>
+      <span><span class="ldot" style="background:#f5f5f5"></span>Fin de semana</span>
+      <span style="margin-left:auto;font-size:11px">Regla: 3+ días = cumple</span>
+    </div>
+    <div class="filters"><input type="text" id="sSem" placeholder="Buscar empleado..." oninput="fSem()"/></div>
+    <div id="loadingSem" style="text-align:center;padding:2rem;color:#888;font-size:13px">Cargando...</div>
+    <div id="semOut" style="display:none"></div>
+  </div>
+
+  <div id="tab-calendario" class="panel">
+    <div class="legend">
+      <span><span class="ldot" style="background:#e1f5ee;border:1px solid #1D9E75"></span>Asistió</span>
+      <span><span class="ldot" style="background:#fcebeb;border:1px solid #E24B4A"></span>Ausente (clic para justificar)</span>
+      <span><span class="ldot" style="background:#e6f0ff;border:1px solid #1a5dc8"></span>Justificado</span>
+      <span><span class="ldot" style="background:#f5f5f5"></span>Fin de semana</span>
+    </div>
+    <div class="filters"><input type="text" id="sCal" placeholder="Buscar empleado..." oninput="fCal()"/></div>
+    <div id="loadingCal" style="text-align:center;padding:2rem;color:#888;font-size:13px">Cargando...</div>
+    <div class="emp-grid" id="empGrid" style="display:none"></div>
+  </div>
+
+  <div id="tab-fds" class="panel">
+    <div class="tabs2">
+      <button class="tab2 active" onclick="swFds(this,'fds-marzo')">Marzo</button>
+      <button class="tab2" onclick="swFds(this,'fds-abril')">Abril</button>
+      <button class="tab2" onclick="swFds(this,'fds-mayo')">Mayo</button>
+      <button class="tab2" onclick="swFds(this,'fds-comp')">Comparativo</button>
+    </div>
+    <div id="fds-marzo" class="fds-panel active"></div>
+    <div id="fds-abril" class="fds-panel"></div>
+    <div id="fds-mayo" class="fds-panel"></div>
+    <div id="fds-comp" class="fds-panel">
+      <div class="card"><div class="card-title">Total horas FDS por persona — 3 meses</div><div style="position:relative;height:300px"><canvas id="ch-comp-fds" role="img" aria-label="Comparativo 3 meses horas FDS"></canvas></div></div>
+      <div style="overflow-x:auto;margin-top:1rem" id="tbl-comp-fds"></div>
+    </div>
+  </div>
+
+  <div id="tab-dias" class="panel">
+    <div class="card"><div style="position:relative;height:260px"><canvas id="dChart" role="img" aria-label="Asistencias por día"></canvas></div></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitle">Justificar ausencia</h3>
+    <p id="modalSubtitle"></p>
+    <input type="text" id="modalInput" placeholder="Ej: Vacaciones, Incapacidad, Evento..."/>
+    <div class="modal-btns">
+      <button class="btn btn-danger" id="btnEliminar" onclick="eliminarJust()" style="display:none">Eliminar</button>
+      <button class="btn btn-secondary" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarJust()">Guardar</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL="https://jztiojajhwwdvwwytpcc.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dGlvamFqaHd3ZHZ3d3l0cGNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjU4NTAsImV4cCI6MjA5NTY0MTg1MH0.LYEAV_N77xTbN_QsvbHXfoOJTSmM0QH7tq78yaxjisg";
+const MES=6,ANIO=2026,DOW_INICIO=0,DIAS_MES=30;
+const DH=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+const SEMS=[{"label": "Sem 1", "dias": [1, 2, 3, 4, 5]}, {"label": "Sem 2", "dias": [8, 9, 10, 11, 12]}, {"label": "Sem 3", "dias": [15, 16, 17, 18, 19]}, {"label": "Sem 4", "dias": [22, 23, 24, 25, 26]}, {"label": "Sem 5", "dias": [29, 30]}];
+const GRUPOS={"Asociados y Vicepresidentes": ["Alejandro Martinez", "Enrique Vargas", "Felipe Camacho", "Pedro Duque", "Mauricio Saldarriaga", "Santiago Cardenas", "Nicolas Gomez"], "Analistas": ["Alejandro Castro", "Antonio Fonseca Bayona", "Arturo Acuña", "Esteban Franco", "Gabriel Ocampo", "Gabriel de Bedout", "Godwin Zuluaga", "Juan Camilo Santa", "Juana Mendoza", "Julian Ramirez", "Julian Chamie", "Laura Calderon", "Laura Gomez", "Oscar Gutierrez", "Salomon Peñuela", "Santiago Correal"], "Administrativo": ["Adriana Molano", "Juan Felipe Sanchez", "Dhayra Bedoya", "Diana Avella", "Diana Medina", "Lizeth Torres", "Luz Marina Sanchez", "Maria Paula Nieto", "Camila Guerrero", "Andrey Pedraza"]};
+const resumen=[{"Empleado": "Sergio Gonzalez", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Gabriel Ocampo", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Julian Ramirez", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Julian Chamie", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Juana Mendoza", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Alejandro Castro", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Juan Camilo Santa", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Godwin Zuluaga", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Gabriel de Bedout", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Laura Gomez", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Alejandro Marin", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Arturo Acuña", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Pedro Duque", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Santiago Correal", "Asistencias": 4, "Ausencias": 0, "Total": 4, "Pct": 100.0}, {"Empleado": "Nicolas Gomez", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "Diana Avella", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "Luz Marina Sanchez", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "María Camila Murcia", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "Esteban Franco", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "Maria Paula Nieto", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "Laura Calderon", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "Dhayra Bedoya", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "Camila Guerrero", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "Antonio Fonseca Bayona", "Asistencias": 3, "Ausencias": 1, "Total": 4, "Pct": 75.0}, {"Empleado": "Nicolas Vasquez", "Asistencias": 2, "Ausencias": 2, "Total": 4, "Pct": 50.0}, {"Empleado": "Omar Nassar", "Asistencias": 2, "Ausencias": 2, "Total": 4, "Pct": 50.0}, {"Empleado": "Oscar Gutierrez", "Asistencias": 2, "Ausencias": 2, "Total": 4, "Pct": 50.0}, {"Empleado": "Juan Felipe Sanchez", "Asistencias": 2, "Ausencias": 2, "Total": 4, "Pct": 50.0}, {"Empleado": "Enrique Vargas", "Asistencias": 2, "Ausencias": 2, "Total": 4, "Pct": 50.0}, {"Empleado": "Diana Medina", "Asistencias": 2, "Ausencias": 2, "Total": 4, "Pct": 50.0}, {"Empleado": "Andrey Pedraza", "Asistencias": 2, "Ausencias": 2, "Total": 4, "Pct": 50.0}, {"Empleado": "Claudia Osorio", "Asistencias": 1, "Ausencias": 3, "Total": 4, "Pct": 25.0}, {"Empleado": "Santiago Cardenas", "Asistencias": 1, "Ausencias": 3, "Total": 4, "Pct": 25.0}, {"Empleado": "Lizeth Torres", "Asistencias": 0, "Ausencias": 4, "Total": 4, "Pct": 0.0}, {"Empleado": "Maria Camila Murcia", "Asistencias": 0, "Ausencias": 4, "Total": 4, "Pct": 0.0}, {"Empleado": "Felipe Camacho", "Asistencias": 0, "Ausencias": 4, "Total": 4, "Pct": 0.0}, {"Empleado": "Mauricio Saldarriaga", "Asistencias": 0, "Ausencias": 4, "Total": 4, "Pct": 0.0}, {"Empleado": "Claudia Robledo", "Asistencias": 0, "Ausencias": 4, "Total": 4, "Pct": 0.0}, {"Empleado": "Carlos Cortes", "Asistencias": 0, "Ausencias": 8, "Total": 8, "Pct": 0.0}, {"Empleado": "Salomon Peñuela", "Asistencias": 0, "Ausencias": 4, "Total": 4, "Pct": 0.0}, {"Empleado": "Alejandro Martinez", "Asistencias": 0, "Ausencias": 4, "Total": 4, "Pct": 0.0}, {"Empleado": "Adriana Molano", "Asistencias": 0, "Ausencias": 4, "Total": 4, "Pct": 0.0}];
+const porDia=[{"Dia": 1, "Asistencias": 28}, {"Dia": 2, "Asistencias": 26}, {"Dia": 3, "Asistencias": 22}, {"Dia": 4, "Asistencias": 26}];
+const detalle={"Andrey Pedraza": {"1": "07:32", "2": "08:39"}, "Dhayra Bedoya": {"1": "07:10", "2": "08:12", "4": "07:48"}, "Camila Guerrero": {"1": "08:37", "2": "08:38", "3": "08:28"}, "Luz Marina Sanchez": {"2": "08:21", "3": "08:02", "4": "07:53"}, "Maria Paula Nieto": {"1": "08:16", "2": "08:24", "4": "10:23"}, "Santiago Cardenas": {"1": "08:05"}, "Mauricio Saldarriaga": {}, "Adriana Molano": {}, "Felipe Camacho": {}, "Nicolas Gomez": {"1": "08:31", "2": "11:23", "3": "11:52"}, "Diana Medina": {"3": "08:57", "4": "09:03"}, "Alejandro Martinez": {}, "Enrique Vargas": {"1": "08:30", "2": "15:05"}, "Diana Avella": {"1": "08:54", "2": "08:51", "4": "10:19"}, "Nicolas Vasquez": {"1": "10:56", "4": "10:40"}, "Carlos Cortes": {}, "Laura Gomez": {"1": "07:55", "2": "07:22", "3": "08:20", "4": "08:35"}, "Gabriel Ocampo": {"1": "10:08", "2": "07:22", "3": "07:15", "4": "10:07"}, "Pedro Duque": {"1": "08:38", "2": "08:48", "3": "09:57", "4": "09:14"}, "Lizeth Torres": {}, "Claudia Robledo": {}, "Omar Nassar": {"3": "14:58", "4": "10:03"}, "Juana Mendoza": {"1": "08:26", "2": "08:54", "3": "08:30", "4": "09:22"}, "Salomon Peñuela": {}, "Claudia Osorio": {"4": "15:10"}, "Maria Camila Murcia": {}, "María Camila Murcia": {"1": "07:33", "2": "07:44", "4": "07:41"}, "Juan Camilo Santa": {"1": "08:17", "2": "09:14", "3": "12:45", "4": "16:02"}, "Esteban Franco": {"1": "08:25", "2": "10:25", "4": "08:50"}, "Laura Calderon": {"1": "08:18", "2": "09:34", "4": "09:27"}, "Alejandro Castro": {"1": "18:01", "2": "09:19", "3": "14:03", "4": "11:28"}, "Santiago Correal": {"1": "08:32", "2": "08:53", "3": "09:26", "4": "10:47"}, "Julian Chamie": {"1": "08:22", "2": "09:20", "3": "09:32", "4": "11:55"}, "Oscar Gutierrez": {"1": "13:44", "3": "09:11"}, "Alejandro Marin": {"1": "08:38", "2": "14:06", "3": "08:41", "4": "18:42"}, "Gabriel de Bedout": {"1": "08:01", "2": "08:24", "3": "08:48", "4": "09:11"}, "Godwin Zuluaga": {"1": "08:13", "2": "10:19", "3": "08:55", "4": "08:59"}, "Arturo Acuña": {"1": "08:13", "2": "08:43", "3": "09:07", "4": "08:51"}, "Antonio Fonseca Bayona": {"1": "08:22", "2": "08:55", "3": "09:03"}, "Julian Ramirez": {"1": "08:38", "2": "09:44", "3": "09:30", "4": "12:49"}, "Juan Felipe Sanchez": {"3": "07:42", "4": "07:53"}, "Sergio Gonzalez": {"1": "08:12", "2": "08:11", "3": "08:13", "4": "08:11"}};
+let justificaciones={};
+let modalEmpleado='',modalDia=0,modalFecha='';
+
+async function sbGet(){const r=await fetch(`${SUPABASE_URL}/rest/v1/justificaciones?select=*&fecha=gte.${ANIO}-${String(MES).padStart(2,'0')}-01&fecha=lte.${ANIO}-${String(MES).padStart(2,'0')}-31`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});return r.json();}
+async function sbUpsert(e,f,m){const r=await fetch(`${SUPABASE_URL}/rest/v1/justificaciones`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify({empleado:e,fecha:f,motivo:m})});return r.ok;}
+async function sbDelete(e,f){const r=await fetch(`${SUPABASE_URL}/rest/v1/justificaciones?empleado=eq.${encodeURIComponent(e)}&fecha=eq.${f}`,{method:'DELETE',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});return r.ok;}
+
+function badge(p){if(p>=70)return`<span class="badge bg">${p}%</span>`;if(p>=40)return`<span class="badge ba">${p}%</span>`;return`<span class="badge br">${p}%</span>`;}
+function color(p){return p>=70?'#1D9E75':p>=40?'#BA7517':'#E24B4A';}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function ff(d){return`${ANIO}-${String(MES).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function finde(d){return(new Date(ANIO,MES-1,d).getDay()+6)%7>=5;}
+function dlbl(d){return['L','M','X','J','V','S','D'][(new Date(ANIO,MES-1,d).getDay()+6)%7];}
+function getJust(emp,d){return justificaciones[`${emp}__${ff(d)}`];}
+
+function rRes(data){document.getElementById('rBody').innerHTML=data.map(e=>`<tr><td>${e.Empleado}</td><td>${e.Asistencias}</td><td>${e.Ausencias}</td><td><div class="bar-bg"><div class="bar-fill" style="width:${Math.round(e.Pct)}%;background:${color(e.Pct)}"></div></div></td><td>${badge(e.Pct)}</td></tr>`).join('');}
+function fRes(){const q=document.getElementById('sRes').value.toLowerCase();const o=document.getElementById('oRes').value;let d=resumen.filter(e=>e.Empleado.toLowerCase().includes(q));if(o==='a')d.sort((a,b)=>b.Asistencias-a.Asistencias);else if(o==='au')d.sort((a,b)=>b.Ausencias-a.Ausencias);else d.sort((a,b)=>a.Empleado.localeCompare(b.Empleado));rRes(d);}
+
+function dotH(emp,d){
+  if(finde(d))return`<span class="dot d-fi">${dlbl(d)}</span>`;
+  const h=(detalle[emp]||{})[String(d)];
+  const j=getJust(emp,d);
+  if(h)return`<span class="dot d-si" title="${h}">${dlbl(d)}</span>`;
+  if(j)return`<span class="dot d-ju" title="${j}">${dlbl(d)}</span>`;
+  return`<span class="dot d-no">${dlbl(d)}</span>`;
+}
+
+function cntSem(emp,dias){return dias.filter(d=>{if(finde(d))return false;return(detalle[emp]||{})[String(d)]||getJust(emp,d);}).length;}
+
+function buildSemGrupo(nombre,emps,q){
+  const fil=emps.filter(e=>e.toLowerCase().includes(q));
+  if(!fil.length)return'';
+  const semThs=SEMS.map(s=>{const h=s.dias.filter(d=>!finde(d)).length;return`<th colspan="${s.dias.length}" class="sh">${s.label}</th><th class="sh">✓/${h}</th>`;}).join('');
+  const dThs=SEMS.map(s=>s.dias.map(d=>`<th style="width:20px">${dlbl(d)}<br><span style="font-size:9px">${d}</span></th>`).join('')+`<th class="sh" style="width:32px"></th>`).join('');
+  const rows=fil.map(emp=>{
+    const cells=SEMS.map(s=>{
+      const dots=s.dias.map(d=>`<td>${dotH(emp,d)}</td>`).join('');
+      const h=s.dias.filter(d=>!finde(d)).length;
+      const c=cntSem(emp,s.dias);
+      const cls=c>=3?'c-g':c===2?'c-a':'c-r';
+      return dots+`<td class="sh"><span class="${cls}">${c}/${h}</span></td>`;
+    }).join('');
+    return`<tr><td class="nm" title="${emp}">${emp}</td>${cells}</tr>`;
+  }).join('');
+  return`<p class="sem-title">${nombre}</p><div style="overflow-x:auto"><table class="sem-table"><thead><tr><th class="nm">Empleado</th>${semThs}</tr><tr><th></th>${dThs}</tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+function renderSem(q=''){document.getElementById('semOut').innerHTML=Object.entries(GRUPOS).map(([g,e])=>buildSemGrupo(g,e,q)).join('');}
+function fSem(){renderSem(document.getElementById('sSem').value.toLowerCase());}
+
+function buildCal(emp){
+  const dias=(detalle[emp]||{});
+  const info=resumen.find(e=>e.Empleado===emp)||{};
+  let h=`<div class="emp-card"><div class="emp-name">${emp}</div><div class="emp-stats">${info.Asistencias||0} asistencias &middot; ${info.Pct||0}%</div><div class="cal-grid">`;
+  DH.forEach(d=>{h+=`<div class="cal-h">${d}</div>`;});
+  for(let i=0;i<DOW_INICIO;i++)h+=`<div class="cal-d empty"></div>`;
+  for(let d=1;d<=DIAS_MES;d++){
+    const dow=(new Date(ANIO,MES-1,d).getDay()+6)%7;
+    const fd=dow>=5;
+    const hora=dias[String(d)];
+    const fecha=ff(d);
+    const just=getJust(emp,d);
+    let cls,lbl;
+    if(fd){cls='finde';lbl=d;}
+    else if(hora){cls='si';lbl=`${d}<span class="hora">${hora}</span>`;}
+    else if(just){cls='justificado';lbl=`${d}<span class="hora">${just.substring(0,6)}</span>`;}
+    else{cls='no';lbl=d;}
+    const oc=(!fd&&!hora)?`onclick="abrirModal('${emp.replace(/'/g,"\'")}', ${d},'${fecha}')"` :'';
+    h+=`<div class="cal-d ${cls}" ${oc} title="${just||''}">${lbl}</div>`;
+  }
+  h+=`</div></div>`;return h;
+}
+
+function rCal(emps){document.getElementById('empGrid').innerHTML=emps.map(e=>buildCal(e)).join('');}
+function fCal(){const q=document.getElementById('sCal').value.toLowerCase();rCal(resumen.map(e=>e.Empleado).filter(e=>e.toLowerCase().includes(q)));}
+
+function abrirModal(emp,dia,fecha){modalEmpleado=emp;modalDia=dia;modalFecha=fecha;const just=getJust(emp,dia)||'';document.getElementById('modalTitle').textContent=just?'Editar justificación':'Justificar ausencia';document.getElementById('modalSubtitle').textContent=`${emp} — ${fecha}`;document.getElementById('modalInput').value=just;document.getElementById('btnEliminar').style.display=just?'block':'none';document.getElementById('modalBg').classList.add('show');document.getElementById('modalInput').focus();}
+function cerrarModal(){document.getElementById('modalBg').classList.remove('show');}
+async function guardarJust(){const motivo=document.getElementById('modalInput').value.trim();if(!motivo){showToast('Escribe un motivo');return;}const ok=await sbUpsert(modalEmpleado,modalFecha,motivo);if(ok){justificaciones[`${modalEmpleado}__${modalFecha}`]=motivo;cerrarModal();fCal();renderSem(document.getElementById('sSem').value.toLowerCase());showToast('Guardado ✓');}else showToast('Error al guardar');}
+async function eliminarJust(){const ok=await sbDelete(modalEmpleado,modalFecha);if(ok){delete justificaciones[`${modalEmpleado}__${modalFecha}`];cerrarModal();fCal();renderSem(document.getElementById('sSem').value.toLowerCase());showToast('Eliminado');}else showToast('Error');}
+
+async function cargarJust(){
+  try{const data=await sbGet();justificaciones={};data.forEach(j=>{justificaciones[`${j.empleado}__${j.fecha}`]=j.motivo;});}catch(e){}
+}
+
+async function sw(btn,name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
+  if((name==='calendario'||name==='semanal')&&Object.keys(justificaciones).length===0){
+    await cargarJust();
+  }
+  if(name==='calendario'&&!document.getElementById('empGrid').innerHTML){
+    document.getElementById('loadingCal').style.display='none';
+    document.getElementById('empGrid').style.display='grid';
+    rCal(resumen.map(e=>e.Empleado));
+  }
+  if(name==='semanal'&&!document.getElementById('semOut').innerHTML){
+    document.getElementById('loadingSem').style.display='none';
+    document.getElementById('semOut').style.display='block';
+    renderSem();
+  }
+}
+
+
+// ── FDS DATA ──
+const FDS_DATA = {
+  marzo:{
+    labels:["01-Mar","07-Mar","08-Mar","14-Mar","15-Mar","21-Mar","22-Mar","23-Mar","28-Mar","29-Mar"],
+    users:[
+      {n:"Alejandro Castro",    h:[0.0,0.67,2.6,6.22,3.49,3.2,5.95,2.87,0.0,4.29]},
+      {n:"Antonio Fonseca",     h:[4.77,0.0,2.39,1.48,0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Arturo Acuña",        h:[1.18,0.0,0.0,0.0,0.0,1.89,1.67,2.25,0.0,0.66]},
+      {n:"Esteban Franco",      h:[0.0,0.0,0.0,0.0,0.0,0.0,1.89,0.54,0.0,0.0]},
+      {n:"Gabriel Ocampo",      h:[0.0,0.0,0.0,0.0,0.0,0.0,1.0,1.86,0.0,0.0]},
+      {n:"Gabriel de Bedout",   h:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Godwin Zuluaga",      h:[0.0,0.0,0.0,0.0,0.89,1.82,1.18,5.1,4.91,2.53]},
+      {n:"Juan Camilo Santa",   h:[0.7,2.37,2.12,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Juana Mendoza",       h:[0.0,0.0,0.0,0.0,0.59,4.96,1.5,0.65,0.0,0.0]},
+      {n:"Julian Chamie",       h:[2.38,0.0,0.0,2.16,0.0,2.16,2.61,0.77,6.62,4.76]},
+      {n:"Julian Ramirez",      h:[2.21,0.0,1.25,3.5,0.74,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Laura Calderon",      h:[2.81,0.53,0.0,0.0,2.46,15.15,0.0,0.0,3.98,2.0]},
+      {n:"Nicolas Vasquez",     h:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Omar Nassar",         h:[0.0,0.66,3.02,0.0,0.0,0.0,0.0,2.89,0.0,0.0]},
+      {n:"Oscar Gutierrez",     h:[0.0,0.0,0.0,0.0,0.0,0.0,1.57,0.0,0.0,0.0]},
+      {n:"Salomon Peñuela",     h:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.51,0.0,0.0]},
+      {n:"Santiago Correal",    h:[0.0,1.27,0.0,1.05,3.18,3.36,0.0,6.01,0.0,7.81]},
+      {n:"Santiago Zea",        h:[0.0,0.91,0.0,0.0,0.0,0.0,0.0,2.59,0.0,0.0]}
+    ]
+  },
+  abril:{
+    labels:["02-Abr","03-Abr","04-Abr","05-Abr","11-Abr","12-Abr","18-Abr","19-Abr","25-Abr","26-Abr"],
+    users:[
+      {n:"Alejandro Castro",    h:[3.03,0.58,0.0,0.0,1.31,1.54,0.77,0.0,0.0,0.0]},
+      {n:"Antonio Fonseca",     h:[0.0,0.0,0.0,1.44,6.18,0.72,0.76,0.0,0.0,0.0]},
+      {n:"Arturo Acuña",        h:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Esteban Franco",      h:[0.0,0.0,0.0,0.91,0.0,1.89,0.0,0.0,0.0,0.0]},
+      {n:"Gabriel Ocampo",      h:[0.0,0.0,0.0,0.0,0.0,2.34,0.0,0.0,0.61,0.65]},
+      {n:"Gabriel de Bedout",   h:[0.0,0.0,0.0,0.0,1.64,0.0,2.97,0.0,0.0,0.0]},
+      {n:"Godwin Zuluaga",      h:[1.45,0.0,0.0,0.0,0.0,3.38,2.21,0.0,0.0,0.0]},
+      {n:"Juan Camilo Santa",   h:[0.93,1.86,0.0,0.0,6.68,1.38,1.75,0.0,2.17,0.0]},
+      {n:"Juana Mendoza",       h:[0.0,0.0,0.0,0.0,2.09,0.0,0.62,0.0,0.55,0.0]},
+      {n:"Julian Chamie",       h:[0.0,0.0,0.0,0.0,5.49,0.52,1.08,0.0,2.98,0.0]},
+      {n:"Julian Ramirez",      h:[0.0,0.0,0.0,5.2,1.98,0.0,0.0,0.0,0.0,1.56]},
+      {n:"Laura Calderon",      h:[0.0,0.0,0.0,0.0,2.11,0.0,2.0,0.0,0.68,0.0]},
+      {n:"Nicolas Vasquez",     h:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Omar Nassar",         h:[2.81,2.61,0.0,0.0,0.52,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Oscar Gutierrez",     h:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Salomon Peñuela",     h:[7.37,0.49,1.74,8.76,3.31,0.0,0.0,0.66,0.84,0.91]},
+      {n:"Santiago Correal",    h:[1.49,1.45,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.54]},
+      {n:"Santiago Zea",        h:[1.24,1.96,0.0,0.0,0.0,0.0,0.0,0.67,4.07,0.95]}
+    ]
+  },
+  mayo:{
+    labels:["01-May","02-May","03-May","09-May","10-May","16-May","17-May","18-May","23-May","24-May","30-May","31-May"],
+    users:[
+      {n:"Alejandro Castro",    h:[0.65,0.08,0.23,0.32,0.31,1.42,0.17,1.88,1.59,0.28,0.24,2.97]},
+      {n:"Antonio Fonseca",     h:[0.0,0.02,0.0,0.0,1.12,1.04,0.27,3.2,1.46,0.93,1.95,3.53]},
+      {n:"Arturo Acuña",        h:[0.16,0.0,0.01,0.07,0.0,1.15,0.29,1.35,0.16,0.06,0.32,0.0]},
+      {n:"Esteban Franco",      h:[1.29,0.04,0.59,0.39,0.19,0.55,0.01,1.01,0.64,0.0,6.57,3.58]},
+      {n:"Gabriel Ocampo",      h:[0.82,0.1,0.0,0.37,0.0,2.01,0.18,0.96,2.01,1.02,0.91,0.93]},
+      {n:"Gabriel de Bedout",   h:[0.0,0.06,0.01,0.17,0.34,0.01,0.03,0.91,0.0,0.0,0.28,1.49]},
+      {n:"Godwin Zuluaga",      h:[0.0,0.0,0.0,0.1,0.0,0.65,0.0,1.92,1.27,0.49,0.0,0.01]},
+      {n:"Juan Camilo Santa",   h:[7.55,7.23,2.82,2.17,0.32,0.0,0.0,1.39,0.78,3.8,1.45,2.4]},
+      {n:"Juana Mendoza",       h:[7.28,10.19,8.38,0.09,1.14,0.38,0.11,3.53,0.72,0.54,2.37,1.98]},
+      {n:"Julian Chamie",       h:[0.0,0.0,0.0,0.0,0.01,0.0,0.0,0.02,0.0,0.0,0.0,0.0]},
+      {n:"Julian Ramirez",      h:[0.17,0.43,2.34,0.0,0.23,0.0,1.18,0.94,1.7,0.3,1.93,6.0]},
+      {n:"Laura Calderon",      h:[0.0,0.61,0.0,0.02,0.03,0.68,0.01,4.31,0.04,1.25,0.19,3.12]},
+      {n:"Nicolas Vasquez",     h:[0.3,0.49,0.56,0.0,0.0,0.48,0.26,0.31,0.87,0.0,0.07,0.0]},
+      {n:"Omar Nassar",         h:[5.15,1.65,3.51,0.0,0.0,1.06,1.69,0.07,6.65,0.4,0.23,2.89]},
+      {n:"Oscar Gutierrez",     h:[0.01,0.93,0.0,0.14,0.16,0.03,0.02,4.62,0.28,0.71,0.71,1.57]},
+      {n:"Salomon Peñuela",     h:[2.3,0.01,0.02,0.0,0.54,6.09,0.5,4.45,3.97,0.0,2.34,0.65]},
+      {n:"Santiago Correal",    h:[7.41,6.55,5.71,0.0,1.67,0.17,0.96,1.18,2.38,1.66,0.13,1.71]}
+    ]
+  }
+};
+
+const fdsCharts={};
+function fTot(u){return u.h.reduce((s,x)=>s+x,0);}
+function fBc(t){return t>15?'#C0392B':t>=5?'#C87A00':'#1B7A3E';}
+function fCls(t){return t>15?'br':t>=5?'ba':'bg';}
+function fHcls(h){if(h===0)return 'h0';if(h<2)return 'hg';if(h<5)return 'ha';if(h<10)return 'hr';return 'hrr';}
+function fFmt(h){return h>0?h.toFixed(1):'—';}
+
+function buildFdsPanel(mes){
+  const d=FDS_DATA[mes];
+  const sorted=[...d.users].sort((a,b)=>fTot(b)-fTot(a));
+  const activos=sorted.filter(u=>fTot(u)>0);
+  const totalH=sorted.reduce((s,u)=>s+fTot(u),0);
+  const maxU=sorted[0];
+  const rojos=sorted.filter(u=>fTot(u)>15).length;
+  const prom=activos.length>0?(totalH/activos.length).toFixed(1):0;
+  const ths=d.labels.map(l=>`<th>${l}</th>`).join('');
+  const rows=sorted.map(u=>{
+    const t=fTot(u);
+    const cells=u.h.map(h=>`<td><span class="hcell ${fHcls(h)}">${fFmt(h)}</span></td>`).join('');
+    return `<tr><td class="nm">${u.n}</td>${cells}<td style="background:#f9f9f9;font-weight:500"><span class="bdg ${fCls(t)}">${t.toFixed(1)}h</span></td></tr>`;
+  }).join('');
+  return `
+    <div class="kpi-fds">
+      <div class="kpi"><div class="kpi-label">Total horas</div><div class="kpi-val">${totalH.toFixed(1)}h</div></div>
+      <div class="kpi"><div class="kpi-label">Activos</div><div class="kpi-val">${activos.length}<span style="font-size:12px;color:#aaa">/${d.users.length}</span></div></div>
+      <div class="kpi"><div class="kpi-label">Promedio</div><div class="kpi-val">${prom}h</div></div>
+      <div class="kpi"><div class="kpi-label">Más horas</div><div class="kpi-val" style="font-size:14px">${maxU.n.split(' ')[0]}</div><div class="kpi-sub">${fTot(maxU).toFixed(1)}h</div></div>
+      <div class="kpi"><div class="kpi-label">Alerta roja</div><div class="kpi-val" style="color:#C0392B">${rojos}</div><div class="kpi-sub">>15h</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.2rem">
+      <div class="card"><div class="card-title">Top por horas FDS</div><div style="position:relative;height:220px"><canvas id="ch-top-fds-${mes}" role="img" aria-label="Top FDS ${mes}"></canvas></div></div>
+      <div class="card"><div class="card-title">Horas por día FDS</div><div style="position:relative;height:220px"><canvas id="ch-dia-fds-${mes}" role="img" aria-label="Días FDS ${mes}"></canvas></div></div>
+    </div>
+    <div class="legend">
+      <span><span class="ldot" style="background:#1B7A3E"></span>Verde ≤5h</span>
+      <span><span class="ldot" style="background:#C87A00"></span>Amarillo 5-15h</span>
+      <span><span class="ldot" style="background:#C0392B"></span>Rojo >15h</span>
+    </div>
+    <div style="overflow-x:auto"><table class="fds-tbl">
+      <thead><tr><th class="nm">Persona</th>${ths}<th style="background:#f9f9f9">Total</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div>`;
+}
+
+function drawFdsCharts(mes){
+  const d=FDS_DATA[mes];
+  const sorted=[...d.users].sort((a,b)=>fTot(b)-fTot(a)).filter(u=>fTot(u)>0).slice(0,10);
+  const k1=`top-fds-${mes}`,k2=`dia-fds-${mes}`;
+  if(fdsCharts[k1]) fdsCharts[k1].destroy();
+  fdsCharts[k1]=new Chart(document.getElementById(`ch-${k1}`),{
+    type:'bar',
+    data:{labels:sorted.map(u=>u.n.split(' ').slice(0,2).join(' ')),
+      datasets:[{data:sorted.map(u=>+fTot(u).toFixed(1)),backgroundColor:sorted.map(u=>fBc(fTot(u))),borderRadius:3,borderSkipped:false}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw}h`}}},
+      scales:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+  });
+  const porDia=d.labels.map((_,i)=>+d.users.reduce((s,u)=>s+u.h[i],0).toFixed(1));
+  if(fdsCharts[k2]) fdsCharts[k2].destroy();
+  fdsCharts[k2]=new Chart(document.getElementById(`ch-${k2}`),{
+    type:'bar',
+    data:{labels:d.labels,datasets:[{data:porDia,backgroundColor:porDia.map(h=>h>20?'#C0392B':h>10?'#C87A00':'#1B7A3E'),borderRadius:3,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw}h`}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10},autoSkip:false,maxRotation:45}},y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},callback:v=>v+'h'}}}}
+  });
+}
+
+function drawFdsComp(){
+  const names=[...new Set([...FDS_DATA.marzo.users,...FDS_DATA.abril.users,...FDS_DATA.mayo.users].map(u=>u.n))].sort();
+  const mH=Object.fromEntries(FDS_DATA.marzo.users.map(u=>[u.n,fTot(u)]));
+  const aH=Object.fromEntries(FDS_DATA.abril.users.map(u=>[u.n,fTot(u)]));
+  const myH=Object.fromEntries(FDS_DATA.mayo.users.map(u=>[u.n,fTot(u)]));
+  const activos=names.filter(n=>(mH[n]||0)+(aH[n]||0)+(myH[n]||0)>0);
+  if(fdsCharts.comp) fdsCharts.comp.destroy();
+  fdsCharts.comp=new Chart(document.getElementById('ch-comp-fds'),{
+    type:'bar',
+    data:{labels:activos,datasets:[
+      {label:'Marzo', data:activos.map(n=>+(mH[n]||0).toFixed(1)),backgroundColor:'#193457',borderRadius:2},
+      {label:'Abril',  data:activos.map(n=>+(aH[n]||0).toFixed(1)),backgroundColor:'#3266AC',borderRadius:2},
+      {label:'Mayo',   data:activos.map(n=>+(myH[n]||0).toFixed(1)),backgroundColor:'#6A9FD8',borderRadius:2},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:11}}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:10},autoSkip:false,maxRotation:45}},
+        y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},callback:v=>v+'h'}}}}
+  });
+  const rows=activos.map(n=>{
+    const m=+(mH[n]||0).toFixed(1),a=+(aH[n]||0).toFixed(1),my=+(myH[n]||0).toFixed(1),tot=+(m+a+my).toFixed(1);
+    return `<tr><td class="nm">${n}</td>
+      <td><span class="bdg ${fCls(m)}">${m}h</span></td>
+      <td><span class="bdg ${fCls(a)}">${a}h</span></td>
+      <td><span class="bdg ${fCls(my)}">${my}h</span></td>
+      <td style="font-weight:500">${tot}h</td></tr>`;
+  }).join('');
+  document.getElementById('tbl-comp-fds').innerHTML=`<table class="fds-tbl">
+    <thead><tr><th class="nm">Persona</th><th>Marzo</th><th>Abril</th><th>Mayo</th><th>Total</th></tr></thead>
+    <tbody>${rows}</tbody></table>`;
+}
+
+function swFds(btn,name){
+  document.querySelectorAll('.tab2').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.fds-panel').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(name).classList.add('active');
+  const mes=name.replace('fds-','');
+  if(mes==='comp') setTimeout(()=>drawFdsComp(),50);
+  else setTimeout(()=>drawFdsCharts(mes),50);
+}
+
+// Init FDS panels
+['marzo','abril','mayo'].forEach(mes=>{
+  document.getElementById(`fds-${mes}`).innerHTML=buildFdsPanel(mes);
+});
+setTimeout(()=>drawFdsCharts('marzo'),150);
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarModal();});
+document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg'))cerrarModal();});
+rRes(resumen);
+setTimeout(()=>{new Chart(document.getElementById('dChart'),{type:'bar',data:{labels:porDia.map(d=>'Día '+d.Dia),datasets:[{label:'Asistencias',data:porDia.map(d=>d.Asistencias),backgroundColor:porDia.map(d=>d.Asistencias<10?'#E24B4A':'#1D9E75'),borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{font:{size:10},autoSkip:false,maxRotation:45}},y:{grid:{color:'rgba(0,0,0,0.05)'},beginAtZero:true}}}});},100);
+</script>
+</body>
+</html>
