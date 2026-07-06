@@ -91,6 +91,9 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
 .ha{background:#FEF3CD;color:#8B5E0A}.hr{background:#FEE2E2;color:#B91C1C}.hrr{background:#B91C1C;color:#fff}
 .kpi-fds{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:1.4rem}
 .kpi-fds .kpi{background:var(--bg)}
+.mes-fil{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--line);background:var(--white);color:var(--mid);transition:all .15s}
+.mes-fil.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mes-fil:hover:not(.active){background:var(--bg)}
 
 </style>
 </head>
@@ -166,7 +169,18 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
     <div id="fds-abril" class="fds-panel"></div>
     <div id="fds-mayo" class="fds-panel"></div>
     <div id="fds-comp" class="fds-panel">
-      <div class="card"><div class="card-title">Total horas FDS por persona — 3 meses</div><div style="position:relative;height:300px"><canvas id="ch-comp-fds" role="img" aria-label="Comparativo 3 meses horas FDS"></canvas></div></div>
+      <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center">
+        <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Meses:</span>
+        <button class="mes-fil active" data-mes="julio" onclick="toggleMesFil(this)">Julio</button>
+        <button class="mes-fil active" data-mes="junio" onclick="toggleMesFil(this)">Junio</button>
+        <button class="mes-fil active" data-mes="mayo" onclick="toggleMesFil(this)">Mayo</button>
+        <button class="mes-fil active" data-mes="abril" onclick="toggleMesFil(this)">Abril</button>
+        <button class="mes-fil active" data-mes="marzo" onclick="toggleMesFil(this)">Marzo</button>
+        <span style="width:1px;height:20px;background:var(--line);margin:0 4px"></span>
+        <button onclick="toggleTodosMeses(true)" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:var(--white);cursor:pointer;color:var(--mid);font-weight:500">Todos</button>
+        <button onclick="toggleTodosMeses(false)" style="font-size:11px;padding:4px 10px;border-radius:6px;border:1px solid var(--line);background:var(--white);cursor:pointer;color:var(--mid);font-weight:500">Ninguno</button>
+      </div>
+      <div class="card"><div class="card-title">Total horas FDS por persona</div><div style="position:relative;height:300px"><canvas id="ch-comp-fds" role="img" aria-label="Comparativo horas FDS"></canvas></div></div>
       <div style="overflow-x:auto;margin-top:1rem" id="tbl-comp-fds"></div>
     </div>
   </div>
@@ -310,7 +324,7 @@ const FDS_DATA = {
     users:[
       {n:"Alejandro Castro",    h:[0.32,0.32]},
       {n:"Antonio Fonseca",     h:[0.9,1.34]},
-      {n:"Arturo Acña",        h:[0.0,0.38]},
+      {n:"Arturo Acuña",        h:[0.0,0.38]},
       {n:"Esteban Franco",      h:[1.94,0.48]},
       {n:"Gabriel Ocampo",      h:[1.92,1.82]},
       {n:"Gabriel de Bedout",   h:[1.83,0.18]},
@@ -488,6 +502,17 @@ function drawFdsCharts(mes){
   });
 }
 
+function getMesesActivos(){
+  return [...document.querySelectorAll('.mes-fil.active')].map(b=>b.dataset.mes);
+}
+function toggleMesFil(btn){
+  btn.classList.toggle('active');
+  drawFdsComp();
+}
+function toggleTodosMeses(todos){
+  document.querySelectorAll('.mes-fil').forEach(b=>{if(todos)b.classList.add('active');else b.classList.remove('active');});
+  drawFdsComp();
+}
 function drawFdsComp(){
   const names=[...new Set([...FDS_DATA.julio.users,...FDS_DATA.junio.users,...FDS_DATA.marzo.users,...FDS_DATA.abril.users,...FDS_DATA.mayo.users].map(u=>u.n))].sort();
   const julH=Object.fromEntries(FDS_DATA.julio.users.map(u=>[u.n,fTot(u)]));
@@ -495,16 +520,29 @@ function drawFdsComp(){
   const mH=Object.fromEntries(FDS_DATA.marzo.users.map(u=>[u.n,fTot(u)]));
   const aH=Object.fromEntries(FDS_DATA.abril.users.map(u=>[u.n,fTot(u)]));
   const myH=Object.fromEntries(FDS_DATA.mayo.users.map(u=>[u.n,fTot(u)]));
-  const activos=names.filter(n=>(julH[n]||0)+(juH[n]||0)+(mH[n]||0)+(aH[n]||0)+(myH[n]||0)>0);
+  const mesesAct=getMesesActivos();
+  const usaJul=mesesAct.includes('julio'),usaJu=mesesAct.includes('junio'),usaMy=mesesAct.includes('mayo'),usaA=mesesAct.includes('abril'),usaM=mesesAct.includes('marzo');
+  // Ordenar por total de meses seleccionados descendente
+  const activos=names
+    .filter(n=>{
+      const tot=(usaJul?julH[n]||0:0)+(usaJu?juH[n]||0:0)+(usaMy?myH[n]||0:0)+(usaA?aH[n]||0:0)+(usaM?mH[n]||0:0);
+      return tot>0;
+    })
+    .map(n=>{
+      const tot=(usaJul?julH[n]||0:0)+(usaJu?juH[n]||0:0)+(usaMy?myH[n]||0:0)+(usaA?aH[n]||0:0)+(usaM?mH[n]||0:0);
+      return{n,tot};
+    })
+    .sort((a,b)=>b.tot-a.tot)
+    .map(x=>x.n);
   if(fdsCharts.comp) fdsCharts.comp.destroy();
   fdsCharts.comp=new Chart(document.getElementById('ch-comp-fds'),{
     type:'bar',
     data:{labels:activos,datasets:[
-      {label:'Julio',  data:activos.map(n=>+(julH[n]||0).toFixed(1)),backgroundColor:'#2E8B57',borderRadius:2},
-      {label:'Junio',  data:activos.map(n=>+(juH[n]||0).toFixed(1)),backgroundColor:'#1B6B4A',borderRadius:2},
-      {label:'Mayo',   data:activos.map(n=>+(myH[n]||0).toFixed(1)),backgroundColor:'#6A9FD8',borderRadius:2},
-      {label:'Abril',  data:activos.map(n=>+(aH[n]||0).toFixed(1)),backgroundColor:'#3266AC',borderRadius:2},
-      {label:'Marzo', data:activos.map(n=>+(mH[n]||0).toFixed(1)),backgroundColor:'#193457',borderRadius:2},
+      ...(usaJul?[{label:'Julio',  data:activos.map(n=>+(julH[n]||0).toFixed(1)),backgroundColor:'#2E8B57',borderRadius:2}]:[]),
+      ...(usaJu? [{label:'Junio',  data:activos.map(n=>+(juH[n]||0).toFixed(1)),backgroundColor:'#1B6B4A',borderRadius:2}]:[]),
+      ...(usaMy? [{label:'Mayo',   data:activos.map(n=>+(myH[n]||0).toFixed(1)),backgroundColor:'#6A9FD8',borderRadius:2}]:[]),
+      ...(usaA?  [{label:'Abril',  data:activos.map(n=>+(aH[n]||0).toFixed(1)),backgroundColor:'#3266AC',borderRadius:2}]:[]),
+      ...(usaM?  [{label:'Marzo',  data:activos.map(n=>+(mH[n]||0).toFixed(1)),backgroundColor:'#193457',borderRadius:2}]:[]),
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{position:'top',labels:{font:{size:11}}}},
@@ -512,17 +550,27 @@ function drawFdsComp(){
         y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},callback:v=>v+'h'}}}}
   });
   const rows=activos.map(n=>{
-    const jul=+(julH[n]||0).toFixed(1),ju=+(juH[n]||0).toFixed(1),m=+(mH[n]||0).toFixed(1),a=+(aH[n]||0).toFixed(1),my=+(myH[n]||0).toFixed(1),tot=+(jul+ju+m+a+my).toFixed(1);
-    return `<tr><td class="nm">${n}</td>
-      <td><span class="bdg ${fCls(jul)}">${jul}h</span></td>
-      <td><span class="bdg ${fCls(ju)}">${ju}h</span></td>
-      <td><span class="bdg ${fCls(my)}">${my}h</span></td>
-      <td><span class="bdg ${fCls(a)}">${a}h</span></td>
-      <td><span class="bdg ${fCls(m)}">${m}h</span></td>
-      <td style="font-weight:500">${tot}h</td></tr>`;
+    const jul=usaJul?+(julH[n]||0).toFixed(1):null,ju=usaJu?+(juH[n]||0).toFixed(1):null,my=usaMy?+(myH[n]||0).toFixed(1):null,a=usaA?+(aH[n]||0).toFixed(1):null,m=usaM?+(mH[n]||0).toFixed(1):null;
+    const tot=+((jul||0)+(ju||0)+(my||0)+(a||0)+(m||0)).toFixed(1);
+    const tieneRojo=(jul>15)||(ju>15)||(my>15)||(a>15)||(m>15);
+    const rowStyle=tieneRojo?'background:linear-gradient(90deg,#fff5f5 0%,#fff 40%);border-left:3px solid #B91C1C':'';
+    const totStyle=tot>50?'color:#B91C1C;font-weight:700':tot>30?'color:#8B5E0A;font-weight:600':'font-weight:600';
+    return `<tr style="${rowStyle}">
+      <td class="nm" style="padding-left:${tieneRojo?'10px':'14px'}">${tieneRojo?'<span style="color:#B91C1C;margin-right:4px">●</span>':''}${n}</td>
+      ${usaJul?`<td><span class="bdg ${fCls(jul)}">${jul}h</span></td>`:''}
+      ${usaJu?`<td><span class="bdg ${fCls(ju)}">${ju}h</span></td>`:''}
+      ${usaMy?`<td><span class="bdg ${fCls(my)}">${my}h</span></td>`:''}
+      ${usaA?`<td><span class="bdg ${fCls(a)}">${a}h</span></td>`:''}
+      ${usaM?`<td><span class="bdg ${fCls(m)}">${m}h</span></td>`:''}
+      <td style="${totStyle}">${tot}h</td></tr>`;
   }).join('');
-  document.getElementById('tbl-comp-fds').innerHTML=`<table class="fds-tbl">
-    <thead><tr><th class="nm">Persona</th><th>Julio</th><th>Junio</th><th>Mayo</th><th>Abril</th><th>Marzo</th><th>Total</th></tr></thead>
+  const thCols=[['Julio',usaJul],['Junio',usaJu],['Mayo',usaMy],['Abril',usaA],['Marzo',usaM]].filter(x=>x[1]).map(x=>`<th>${x[0]}</th>`).join('');
+  document.getElementById('tbl-comp-fds').innerHTML=`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:#888">
+      <span style="color:#B91C1C;font-size:14px">●</span> Persona con al menos un mes en rojo (&gt;15h) · Ordenado por total descendente
+    </div>
+    <table class="fds-tbl">
+    <thead><tr><th class="nm">Persona</th>${thCols}<th>Total</th></tr></thead>
     <tbody>${rows}</tbody></table>`;
 }
 
