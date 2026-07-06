@@ -6,86 +6,91 @@
 <title>Asistencia Mayo 2026 - Inverlink</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#1a1a1a}
-.header{background:#1a1a2e;color:#fff;padding:1.2rem 2rem;display:flex;align-items:center;justify-content:space-between}
-.header h1{font-size:1.1rem;font-weight:500}.header a{color:#aac4ff;font-size:.85rem;text-decoration:none}
-.container{max-width:1200px;margin:0 auto;padding:1.2rem}
-.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.2rem}
-.kpi{background:#fff;border-radius:8px;padding:1rem;border:1px solid #e5e5e5}
-.kpi-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
-.kpi-val{font-size:26px;font-weight:600;color:#1a1a2e}.kpi-sub{font-size:11px;color:#aaa;margin-top:2px}
-.tabs{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap}
-.tab{padding:7px 16px;border-radius:6px;font-size:13px;cursor:pointer;border:1px solid #e0e0e0;background:#fff;color:#666}
-.tab.active{background:#1a1a2e;color:#fff;border-color:#1a1a2e}
+:root{--ink:#0D1117;--mid:#4A5568;--muted:#8896A5;--line:#E8ECF0;--bg:#F0F2F5;--white:#FFFFFF;--accent:#1a1a2e;--accent2:#264E84;--green:#0F6E56;--amber:#8B5E0A;--red:#B91C1C;--green-bg:#E6F7F0;--amber-bg:#FEF3CD;--red-bg:#FEE2E2;--shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.05)}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5}
+.header{background:var(--accent);color:#fff;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.header h1{font-size:1rem;font-weight:500;letter-spacing:-.01em}.header a{color:rgba(255,255,255,.6);font-size:.8rem;text-decoration:none;transition:color .2s}.header a:hover{color:#fff}
+.container{max-width:1280px;margin:0 auto;padding:1.5rem}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.kpi{background:var(--white);border-radius:12px;padding:1.2rem 1.4rem;box-shadow:var(--shadow);border:1px solid var(--line);transition:transform .15s}
+.kpi:hover{transform:translateY(-1px)}
+.kpi-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.kpi-val{font-size:28px;font-weight:600;color:var(--accent);line-height:1}.kpi-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.tabs{display:flex;gap:4px;margin-bottom:1.2rem;flex-wrap:wrap;background:var(--white);padding:4px;border-radius:10px;box-shadow:var(--shadow);border:1px solid var(--line);width:fit-content}
+.tab{padding:7px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--mid);transition:all .15s}
+.tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 6px rgba(26,26,46,.25)}
+.tab:hover:not(.active){background:var(--bg);color:var(--ink)}
 .panel{display:none}.panel.active{display:block}
-.card{background:#fff;border-radius:8px;padding:1.2rem;border:1px solid #e5e5e5;margin-bottom:1.2rem}
+.card{background:var(--white);border-radius:12px;padding:1.2rem 1.4rem;box-shadow:var(--shadow);border:1px solid var(--line);margin-bottom:1.2rem}
+.card-title{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.8rem}
 .filters{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
-input,select{padding:7px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:13px;outline:none}
-input{flex:1;min-width:180px}
+input,select{padding:8px 12px;border:1.5px solid var(--line);border-radius:8px;font-size:13px;outline:none;font-family:inherit;transition:border-color .15s;background:var(--white)}
+input{flex:1;min-width:180px}input:focus,select:focus{border-color:var(--accent2)}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;padding:9px 12px;color:#888;font-weight:500;border-bottom:1px solid #f0f0f0;font-size:11px;text-transform:uppercase}
-td{padding:9px 12px;border-bottom:1px solid #f9f9f9}tr:hover td{background:#fafafa}
-.bar-bg{background:#f0f0f0;border-radius:4px;height:5px;width:90px;display:inline-block;vertical-align:middle}
+th{text-align:left;padding:10px 14px;color:var(--muted);font-weight:600;border-bottom:2px solid var(--line);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:#F7F9FC}
+.bar-bg{background:var(--line);border-radius:4px;height:5px;width:100px;display:inline-block;vertical-align:middle}
 .bar-fill{height:5px;border-radius:4px}
-.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600}
-.bg{background:#e1f5ee;color:#0f6e56}.ba{background:#faeeda;color:#854f0b}.br{background:#fcebeb;color:#a32d2d}
-.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
-.emp-card{background:#fff;border-radius:8px;padding:1rem;border:1px solid #e5e5e5}
-.emp-name{font-size:13px;font-weight:600;color:#1a1a2e;margin-bottom:4px}
-.emp-stats{font-size:11px;color:#888;margin-bottom:10px}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
-.cal-h{font-size:9px;color:#aaa;text-align:center;padding:2px 0;font-weight:600}
-.cal-d{border-radius:3px;padding:3px 1px;text-align:center;font-size:10px;font-weight:500;min-height:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;cursor:default}
-.cal-d.empty{background:transparent}.cal-d.si{background:#e1f5ee;color:#0f6e56}
-.cal-d.no{background:#fcebeb;color:#a32d2d;cursor:pointer}.cal-d.no:hover{background:#f5c6c6}
-.cal-d.justificado{background:#e6f0ff;color:#1a5dc8;cursor:pointer}
-.cal-d.finde,.cal-d.festivo{background:#f5f5f5;color:#ccc}
-.cal-d .hora{font-size:7.5px;font-weight:400;opacity:.85}
-.legend{display:flex;gap:12px;margin-bottom:1rem;font-size:12px;color:#666;flex-wrap:wrap}
-.ldot{width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:4px;vertical-align:middle}
-.modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center}
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.02em}
+.bg{background:var(--green-bg);color:var(--green)}.ba{background:var(--amber-bg);color:var(--amber)}.br{background:var(--red-bg);color:var(--red)}
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.emp-card{background:var(--white);border-radius:12px;padding:1.1rem 1.2rem;box-shadow:var(--shadow);border:1px solid var(--line)}
+.emp-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.emp-stats{font-size:11px;color:var(--muted);margin-bottom:10px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-h{font-size:9px;color:var(--muted);text-align:center;padding:3px 0;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.cal-d{border-radius:5px;padding:3px 1px;text-align:center;font-size:10px;font-weight:500;min-height:30px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.3;cursor:default;transition:opacity .15s}
+.cal-d.empty{background:transparent}.cal-d.si{background:#DCF5EC;color:#0A5C45}
+.cal-d.no{background:#FEE2E2;color:#991B1B;cursor:pointer}.cal-d.no:hover{background:#FECACA;opacity:.85}
+.cal-d.justificado{background:#DBEAFE;color:#1D4ED8;cursor:pointer}
+.cal-d.finde,.cal-d.festivo{background:#F1F3F5;color:#C0C8D4}
+.cal-d .hora{font-size:7.5px;font-weight:400;opacity:.8}
+.legend{display:flex;gap:14px;margin-bottom:1rem;font-size:12px;color:var(--mid);flex-wrap:wrap;align-items:center}
+.ldot{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle}
+.modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(13,17,23,.5);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
 .modal-bg.show{display:flex}
-.modal{background:#fff;border-radius:12px;padding:1.5rem;width:400px;max-width:90%}
-.modal h3{font-size:15px;font-weight:600;margin-bottom:.5rem;color:#1a1a2e}
-.modal p{font-size:13px;color:#888;margin-bottom:1rem}
+.modal{background:var(--white);border-radius:16px;padding:1.8rem;width:420px;max-width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:.4rem;color:var(--ink)}
+.modal p{font-size:12px;color:var(--muted);margin-bottom:1rem}
 .modal input{width:100%;margin-bottom:.5rem}
-.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1rem}
-.btn{padding:8px 16px;border-radius:6px;font-size:13px;cursor:pointer;border:none;font-weight:500}
-.btn-primary{background:#1a1a2e;color:#fff}.btn-secondary{background:#f0f0f0;color:#666}
-.btn-danger{background:#fcebeb;color:#a32d2d}
-.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1a1a2e;color:#fff;padding:.8rem 1.2rem;border-radius:8px;font-size:13px;z-index:2000;display:none}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:1.2rem}
+.btn{padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#2a2a4e}
+.btn-secondary{background:var(--line);color:var(--mid)}.btn-secondary:hover{background:#D8DCE0}
+.btn-danger{background:var(--red-bg);color:var(--red)}.btn-danger:hover{background:#FECACA}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--ink);color:#fff;padding:.8rem 1.4rem;border-radius:10px;font-size:13px;z-index:2000;display:none;box-shadow:0 8px 24px rgba(0,0,0,.2);font-weight:500}
 .toast.show{display:block}
-.sem-title{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.06em;margin:1.2rem 0 8px}
+.sem-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:1.4rem 0 10px;padding-bottom:6px;border-bottom:2px solid var(--line)}
 .sem-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:1.5rem;overflow-x:auto;display:block}
-.sem-table th{padding:5px 3px;text-align:center;font-weight:500;color:#888;border-bottom:1px solid #f0f0f0;font-size:10px;white-space:nowrap}
-.sem-table th.nm{text-align:left;min-width:130px}
-.sem-table th.sh{background:#f9f9f9;border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0}
-.sem-table td{padding:4px 3px;text-align:center;border-bottom:1px solid #f9f9f9}
-.sem-table td.nm{text-align:left;font-size:12px;padding-left:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
-.sem-table td.sh{background:#f9f9f9;border-left:1px solid #f0f0f0;border-right:1px solid #f0f0f0;font-size:11px;font-weight:500}
-.dot{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:500}
-.d-si{background:#e1f5ee;color:#0f6e56}.d-no{background:#fcebeb;color:#a32d2d}
-.d-ju{background:#e6f0ff;color:#1a5dc8}.d-fi{background:#f5f5f5;color:#ccc}
-.c-g{color:#0f6e56;font-weight:500}.c-a{color:#854f0b;font-weight:500}.c-r{color:#a32d2d;font-weight:500}
+.sem-table th{padding:6px 4px;text-align:center;font-weight:600;color:var(--muted);border-bottom:2px solid var(--line);font-size:10px;white-space:nowrap;text-transform:uppercase;letter-spacing:.05em}
+.sem-table th.nm{text-align:left;min-width:140px}
+.sem-table th.sh{background:#F7F9FC;border-left:1px solid var(--line);border-right:1px solid var(--line)}
+.sem-table td{padding:5px 4px;text-align:center;border-bottom:1px solid var(--line)}
+.sem-table td.nm{text-align:left;font-size:12px;padding-left:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;font-weight:500}
+.sem-table td.sh{background:#F7F9FC;border-left:1px solid var(--line);border-right:1px solid var(--line);font-size:11px;font-weight:600}
+.dot{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600}
+.d-si{background:#DCF5EC;color:#0A5C45}.d-no{background:#FEE2E2;color:#991B1B}
+.d-ju{background:#DBEAFE;color:#1D4ED8}.d-fi{background:#F1F3F5;color:#C0C8D4}
+.c-g{color:var(--green);font-weight:600}.c-a{color:var(--amber);font-weight:600}.c-r{color:var(--red);font-weight:600}
 @media(max-width:768px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
-.tabs2{display:flex;gap:4px;margin-bottom:1rem;flex-wrap:wrap}
-.tab2{padding:6px 14px;border-radius:6px;font-size:12px;cursor:pointer;border:1px solid #e0e0e0;background:#fff;color:#666}
-.tab2.active{background:#264E84;color:#fff;border-color:#264E84}
+.tabs2{display:flex;gap:4px;margin-bottom:1.2rem;flex-wrap:wrap;background:var(--white);padding:4px;border-radius:10px;box-shadow:var(--shadow);border:1px solid var(--line);width:fit-content}
+.tab2{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--mid);transition:all .15s}
+.tab2.active{background:var(--accent2);color:#fff;box-shadow:0 2px 6px rgba(38,78,132,.25)}
+.tab2:hover:not(.active){background:var(--bg)}
 .fds-panel{display:none}.fds-panel.active{display:block}
-.card{background:#fff;border-radius:8px;padding:1.2rem;border:1px solid #e5e5e5;margin-bottom:1.2rem}
-.card-title{font-size:11px;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.8rem}
 .fds-tbl{width:100%;border-collapse:collapse;font-size:12px;overflow-x:auto;display:block}
-.fds-tbl th{padding:5px 6px;text-align:center;font-weight:500;color:#888;border-bottom:1px solid #f0f0f0;font-size:10px;white-space:nowrap}
-.fds-tbl th.nm{text-align:left;min-width:140px}
-.fds-tbl td{padding:4px 4px;text-align:center;border-bottom:1px solid #f9f9f9}
-.fds-tbl td.nm{text-align:left;font-size:12px;color:#1a1a1a;padding-left:2px;white-space:nowrap}
-.fds-tbl tr:hover td{background:#fafafa}
-.hcell{min-width:40px;height:22px;border-radius:3px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:500}
-.h0{background:#f5f5f5;color:#aaa}.hg{background:#e8f5e9;color:#1B7A3E}
-.ha{background:#fff3cd;color:#856404}.hr{background:#fcebeb;color:#C0392B}.hrr{background:#C0392B;color:#fff}
-.kpi-fds{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.2rem}
-.kpi-fds .kpi{background:#f9f9f9}
+.fds-tbl th{padding:6px 8px;text-align:center;font-weight:600;color:var(--muted);border-bottom:2px solid var(--line);font-size:10px;white-space:nowrap;text-transform:uppercase;letter-spacing:.06em}
+.fds-tbl th.nm{text-align:left;min-width:150px}
+.fds-tbl td{padding:5px 5px;text-align:center;border-bottom:1px solid var(--line)}
+.fds-tbl td.nm{text-align:left;font-size:12px;color:var(--ink);padding-left:4px;white-space:nowrap;font-weight:500}
+.fds-tbl tr:hover td{background:#F7F9FC}
+.hcell{min-width:42px;height:24px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600}
+.h0{background:#F1F3F5;color:#C0C8D4}.hg{background:#DCF5EC;color:#0A5C45}
+.ha{background:#FEF3CD;color:#8B5E0A}.hr{background:#FEE2E2;color:#B91C1C}.hrr{background:#B91C1C;color:#fff}
+.kpi-fds{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:1.4rem}
+.kpi-fds .kpi{background:var(--bg)}
 
 </style>
 </head>
@@ -96,16 +101,15 @@ td{padding:9px 12px;border-bottom:1px solid #f9f9f9}tr:hover td{background:#fafa
 </div>
 <div class="container">
   <div class="kpi-grid">
-    <div class="kpi"><div class="kpi-label">Empleados</div><div class="kpi-val">46</div><div class="kpi-sub">Mayo 2026</div></div>
+    <div class="kpi"><div class="kpi-label">Empleados</div><div class="kpi-val">45</div><div class="kpi-sub">Mayo 2026</div></div>
     <div class="kpi"><div class="kpi-label">Días hábiles</div><div class="kpi-val">21</div><div class="kpi-sub">lun–vie del mes</div></div>
     <div class="kpi"><div class="kpi-label">Mejor asistencia</div><div class="kpi-val">85.7%</div><div class="kpi-sub">máximo del mes</div></div>
-    <div class="kpi"><div class="kpi-label">Promedio días</div><div class="kpi-val">11.7</div><div class="kpi-sub">por empleado</div></div>
+    <div class="kpi"><div class="kpi-label">Promedio días</div><div class="kpi-val">11.6</div><div class="kpi-sub">por empleado</div></div>
   </div>
   <div class="tabs">
     <button class="tab active" onclick="sw(this,'resumen')">Resumen</button>
     <button class="tab" onclick="sw(this,'semanal')">Informe semanal</button>
     <button class="tab" onclick="sw(this,'calendario')">Calendario</button>
-    <button class="tab" onclick="sw(this,'dias')">Por día</button>
     <button class="tab" onclick="sw(this,'fds')">FDS</button>
   </div>
 
@@ -149,12 +153,16 @@ td{padding:9px 12px;border-bottom:1px solid #f9f9f9}tr:hover td{background:#fafa
 
   <div id="tab-fds" class="panel">
     <div class="tabs2">
-      <button class="tab2 active" onclick="swFds(this,'fds-marzo')">Marzo</button>
+      <button class="tab2 active" onclick="swFds(this,'fds-julio')">Julio</button>
+      <button class="tab2" onclick="swFds(this,'fds-junio')">Junio</button>
+      <button class="tab2" onclick="swFds(this,'fds-marzo')">Marzo</button>
       <button class="tab2" onclick="swFds(this,'fds-abril')">Abril</button>
       <button class="tab2" onclick="swFds(this,'fds-mayo')">Mayo</button>
       <button class="tab2" onclick="swFds(this,'fds-comp')">Comparativo</button>
     </div>
-    <div id="fds-marzo" class="fds-panel active"></div>
+    <div id="fds-julio" class="fds-panel active"></div>
+    <div id="fds-junio" class="fds-panel"></div>
+    <div id="fds-marzo" class="fds-panel"></div>
     <div id="fds-abril" class="fds-panel"></div>
     <div id="fds-mayo" class="fds-panel"></div>
     <div id="fds-comp" class="fds-panel">
@@ -163,9 +171,7 @@ td{padding:9px 12px;border-bottom:1px solid #f9f9f9}tr:hover td{background:#fafa
     </div>
   </div>
 
-  <div id="tab-dias" class="panel">
-    <div class="card"><div style="position:relative;height:260px"><canvas id="dChart" role="img" aria-label="Asistencias por día"></canvas></div></div>
-  </div>
+
 </div>
 
 <div class="modal-bg" id="modalBg">
@@ -188,15 +194,15 @@ const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSI
 const MES=5,ANIO=2026,DOW_INICIO=4,DIAS_MES=31;
 const DH=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
 const SEMS=[{"label": "Sem 0", "dias": [1, 2, 3]}, {"label": "Sem 1", "dias": [4, 5, 6, 7, 8]}, {"label": "Sem 2", "dias": [11, 12, 13, 14, 15]}, {"label": "Sem 3", "dias": [18, 19, 20, 21, 22]}, {"label": "Sem 4", "dias": [25, 26, 27, 28, 29]}];
-const GRUPOS={"Asociados y Vicepresidentes": ["Alejandro Martinez", "Enrique Vargas", "Felipe Camacho", "Pedro Duque", "Mauricio Saldarriaga", "Santiago Cardenas", "Nicolas Gomez"], "Analistas": ["Alejandro Castro", "Antonio Fonseca Bayona", "Arturo Acuña", "Esteban Franco", "Gabriel Ocampo", "Gabriel de Bedout", "Godwin Zuluaga", "Juan Camilo Santa", "Juana Mendoza", "Julian Ramirez", "Julian Chamie", "Laura Calderon", "Laura Gomez", "Oscar Gutierrez", "Salomon Peñuela", "Santiago Correal"], "Administrativo": ["Adriana Molano", "Juan Felipe Sanchez", "Dhayra Bedoya", "Diana Avella", "Diana Medina", "Lizeth Torres", "Luz Marina Sanchez", "Maria Paula Nieto", "Camila Guerrero", "Andrey Pedraza"]};
-const resumen=[{"Empleado": "Sergio Gonzalez", "Asistencias": 18, "Ausencias": 3, "Total": 21, "Pct": 85.7}, {"Empleado": "Lizeth Torres", "Asistencias": 18, "Ausencias": 3, "Total": 21, "Pct": 85.7}, {"Empleado": "Gabriel de Bedout", "Asistencias": 18, "Ausencias": 3, "Total": 21, "Pct": 85.7}, {"Empleado": "Gabriel Ocampo", "Asistencias": 18, "Ausencias": 3, "Total": 21, "Pct": 85.7}, {"Empleado": "Antonio Fonseca Bayona", "Asistencias": 17, "Ausencias": 4, "Total": 21, "Pct": 81.0}, {"Empleado": "Esteban Franco", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Julian Ramirez", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Alejandro Castro", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Juan Camilo Santa", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Godwin Zuluaga", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Juan Felipe Sanchez", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Alejandro Marin", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Laura Gomez", "Asistencias": 15, "Ausencias": 6, "Total": 21, "Pct": 71.4}, {"Empleado": "Laura Calderon", "Asistencias": 15, "Ausencias": 6, "Total": 21, "Pct": 71.4}, {"Empleado": "Omar Nassar", "Asistencias": 15, "Ausencias": 6, "Total": 21, "Pct": 71.4}, {"Empleado": "Arturo Acuña", "Asistencias": 15, "Ausencias": 6, "Total": 21, "Pct": 71.4}, {"Empleado": "Salomon Peñuela", "Asistencias": 14, "Ausencias": 7, "Total": 21, "Pct": 66.7}, {"Empleado": "Nicolas Gomez", "Asistencias": 14, "Ausencias": 7, "Total": 21, "Pct": 66.7}, {"Empleado": "Juana Mendoza", "Asistencias": 14, "Ausencias": 7, "Total": 21, "Pct": 66.7}, {"Empleado": "Julian Chamie", "Asistencias": 14, "Ausencias": 7, "Total": 21, "Pct": 66.7}, {"Empleado": "Diana Medina", "Asistencias": 13, "Ausencias": 8, "Total": 21, "Pct": 61.9}, {"Empleado": "Luz Marina Sanchez", "Asistencias": 13, "Ausencias": 8, "Total": 21, "Pct": 61.9}, {"Empleado": "Oscar Gutierrez", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Diana Avella", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Dhayra Bedoya", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Adriana Molano", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Enrique Vargas", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Nicolas Vasquez", "Asistencias": 11, "Ausencias": 10, "Total": 21, "Pct": 52.4}, {"Empleado": "Camila Guerrero", "Asistencias": 11, "Ausencias": 10, "Total": 21, "Pct": 52.4}, {"Empleado": "Maria Paula Nieto", "Asistencias": 10, "Ausencias": 11, "Total": 21, "Pct": 47.6}, {"Empleado": "Santiago Correal", "Asistencias": 9, "Ausencias": 12, "Total": 21, "Pct": 42.9}, {"Empleado": "María Camila Murcia", "Asistencias": 9, "Ausencias": 12, "Total": 21, "Pct": 42.9}, {"Empleado": "Andrey Pedraza", "Asistencias": 9, "Ausencias": 12, "Total": 21, "Pct": 42.9}, {"Empleado": "Pedro Duque", "Asistencias": 7, "Ausencias": 14, "Total": 21, "Pct": 33.3}, {"Empleado": "Alejandro Martinez", "Asistencias": 6, "Ausencias": 15, "Total": 21, "Pct": 28.6}, {"Empleado": "Claudia Osorio", "Asistencias": 5, "Ausencias": 16, "Total": 21, "Pct": 23.8}, {"Empleado": "Carlos Cortes", "Asistencias": 4, "Ausencias": 38, "Total": 42, "Pct": 9.5}, {"Empleado": "Felipe Camacho", "Asistencias": 3, "Ausencias": 18, "Total": 21, "Pct": 14.3}, {"Empleado": "Mauricio Saldarriaga", "Asistencias": 2, "Ausencias": 19, "Total": 21, "Pct": 9.5}, {"Empleado": "Santiago Cardenas", "Asistencias": 2, "Ausencias": 19, "Total": 21, "Pct": 9.5}, {"Empleado": "Claudia Robledo", "Asistencias": 0, "Ausencias": 21, "Total": 21, "Pct": 0.0}, {"Empleado": "Maria Camila Murcia", "Asistencias": 0, "Ausencias": 21, "Total": 21, "Pct": 0.0}];
-const porDia=[{"Dia": 1, "Asistencias": 1}, {"Dia": 4, "Asistencias": 31}, {"Dia": 5, "Asistencias": 28}, {"Dia": 6, "Asistencias": 29}, {"Dia": 7, "Asistencias": 33}, {"Dia": 8, "Asistencias": 17}, {"Dia": 11, "Asistencias": 30}, {"Dia": 12, "Asistencias": 27}, {"Dia": 13, "Asistencias": 24}, {"Dia": 14, "Asistencias": 25}, {"Dia": 15, "Asistencias": 8}, {"Dia": 18, "Asistencias": 3}, {"Dia": 19, "Asistencias": 33}, {"Dia": 20, "Asistencias": 26}, {"Dia": 21, "Asistencias": 28}, {"Dia": 22, "Asistencias": 21}, {"Dia": 25, "Asistencias": 31}, {"Dia": 26, "Asistencias": 36}, {"Dia": 27, "Asistencias": 31}, {"Dia": 28, "Asistencias": 22}, {"Dia": 29, "Asistencias": 8}];
-const detalle={"Andrey Pedraza": {"4": "08:15", "7": "08:17", "11": "08:24", "12": "13:58", "13": "08:30", "14": "08:20", "19": "11:27", "25": "11:53", "29": "08:15"}, "Dhayra Bedoya": {"4": "08:12", "5": "08:34", "8": "08:28", "11": "08:30", "12": "08:34", "14": "08:26", "19": "08:10", "21": "09:17", "22": "08:25", "25": "07:52", "26": "08:38", "27": "08:35"}, "Camila Guerrero": {"6": "08:20", "7": "08:31", "8": "08:43", "11": "08:26", "13": "08:25", "15": "09:09", "19": "08:34", "20": "08:34", "25": "08:49", "26": "18:06", "27": "08:55"}, "Luz Marina Sanchez": {"4": "08:23", "5": "08:33", "6": "11:11", "8": "08:12", "11": "08:11", "12": "08:18", "13": "12:27", "19": "10:47", "20": "09:28", "21": "08:33", "25": "08:04", "26": "08:28", "27": "08:16"}, "Maria Paula Nieto": {"4": "08:24", "5": "09:17", "7": "10:16", "11": "08:17", "12": "12:03", "14": "10:44", "15": "11:46", "19": "08:22", "22": "09:09", "26": "08:46"}, "Santiago Cardenas": {"5": "08:41", "19": "08:11"}, "Mauricio Saldarriaga": {"26": "08:23", "27": "10:06"}, "Adriana Molano": {"4": "08:31", "5": "08:30", "6": "08:31", "11": "08:28", "12": "08:25", "14": "08:56", "19": "08:47", "20": "08:40", "21": "08:16", "25": "08:32", "26": "08:18", "28": "08:44"}, "Felipe Camacho": {"19": "11:41", "20": "10:42", "26": "09:38"}, "Nicolas Gomez": {"4": "08:35", "6": "17:26", "7": "11:14", "8": "09:59", "11": "08:51", "12": "09:34", "13": "10:01", "14": "11:10", "19": "07:57", "20": "09:59", "21": "09:18", "25": "08:58", "26": "09:43", "27": "10:04"}, "Diana Medina": {"4": "08:49", "6": "08:52", "7": "08:53", "11": "08:37", "13": "08:38", "14": "08:54", "19": "08:57", "21": "09:09", "22": "09:18", "26": "08:43", "27": "08:44", "28": "08:51", "29": "08:52"}, "Alejandro Martinez": {"5": "16:10", "6": "11:48", "7": "08:46", "21": "10:38", "26": "16:46", "27": "09:28"}, "Enrique Vargas": {"4": "08:31", "6": "11:54", "7": "09:36", "8": "09:03", "11": "09:40", "12": "09:24", "14": "08:50", "19": "08:05", "20": "08:55", "25": "08:27", "26": "12:29", "27": "09:57"}, "Diana Avella": {"4": "08:20", "5": "08:16", "8": "11:58", "11": "08:10", "12": "07:57", "15": "08:16", "19": "12:52", "20": "11:05", "21": "08:30", "25": "07:48", "26": "08:27", "27": "08:01"}, "Nicolas Vasquez": {"4": "08:32", "6": "13:26", "7": "12:26", "11": "14:18", "13": "09:01", "14": "09:00", "19": "10:44", "21": "14:09", "25": "14:41", "26": "11:04", "28": "13:52"}, "Carlos Cortes": {"5": "15:43", "6": "07:56", "7": "08:25", "27": "10:00"}, "Laura Gomez": {"4": "07:49", "5": "08:15", "6": "08:29", "7": "08:32", "8": "08:40", "12": "08:22", "13": "08:30", "14": "08:25", "19": "08:42", "20": "08:53", "21": "08:35", "22": "08:47", "25": "08:26", "26": "08:02", "27": "08:33"}, "Gabriel Ocampo": {"4": "08:00", "5": "07:11", "6": "08:21", "7": "08:58", "8": "08:59", "11": "07:05", "12": "08:22", "13": "10:14", "14": "07:52", "19": "07:09", "20": "09:32", "21": "08:08", "22": "09:23", "25": "08:02", "26": "09:29", "27": "07:32", "28": "09:48", "29": "09:15"}, "Pedro Duque": {"4": "11:20", "5": "08:30", "6": "08:42", "7": "09:42", "8": "10:56", "25": "08:20", "26": "09:55"}, "Lizeth Torres": {"4": "08:40", "5": "08:36", "6": "08:40", "7": "08:44", "8": "08:02", "11": "08:28", "12": "08:24", "13": "08:29", "14": "08:22", "19": "08:39", "20": "08:38", "21": "08:31", "22": "08:32", "25": "08:23", "26": "08:18", "27": "08:20", "28": "08:26", "29": "08:24"}, "Claudia Robledo": {}, "Omar Nassar": {"4": "14:02", "6": "10:46", "7": "15:20", "8": "11:12", "11": "13:28", "13": "10:56", "14": "11:02", "15": "12:45", "18": "17:44", "19": "13:53", "20": "21:08", "21": "10:08", "22": "10:36", "25": "09:30", "27": "14:06"}, "Juana Mendoza": {"4": "07:53", "5": "09:16", "6": "08:35", "7": "09:21", "8": "08:47", "11": "08:04", "18": "06:38", "19": "08:34", "21": "10:30", "22": "09:02", "25": "08:38", "26": "08:40", "27": "08:48", "28": "09:31"}, "Salomon Peñuela": {"4": "11:52", "5": "07:58", "7": "07:27", "11": "07:58", "12": "13:52", "13": "08:03", "14": "08:16", "19": "07:40", "21": "08:05", "22": "07:41", "25": "10:43", "26": "13:53", "27": "08:58", "28": "09:07"}, "Claudia Osorio": {"6": "10:34", "7": "13:47", "12": "06:47", "21": "10:35", "26": "09:15"}, "Maria Camila Murcia": {}, "María Camila Murcia": {"4": "07:40", "5": "07:52", "7": "07:38", "12": "08:17", "14": "08:04", "25": "07:32", "26": "08:02", "27": "08:14", "28": "07:38"}, "Juan Camilo Santa": {"1": "11:34", "4": "08:21", "5": "09:13", "6": "14:08", "7": "10:18", "11": "19:59", "12": "13:33", "13": "13:14", "15": "08:56", "18": "11:29", "20": "09:20", "22": "09:15", "25": "08:29", "26": "08:51", "27": "19:36", "28": "13:54"}, "Esteban Franco": {"4": "07:56", "5": "08:34", "7": "09:40", "8": "08:57", "11": "09:34", "12": "09:33", "13": "14:12", "14": "14:12", "19": "09:20", "20": "09:11", "21": "14:11", "22": "15:47", "25": "09:01", "26": "08:41", "27": "14:08", "28": "09:24"}, "Laura Calderon": {"4": "08:34", "5": "08:56", "6": "09:37", "7": "09:44", "11": "09:11", "12": "09:36", "13": "09:37", "19": "13:28", "20": "09:50", "21": "09:28", "22": "09:14", "25": "09:09", "26": "08:37", "27": "09:03", "28": "13:55"}, "Alejandro Castro": {"4": "10:36", "5": "11:00", "6": "09:25", "7": "08:56", "11": "08:48", "12": "14:03", "13": "09:44", "14": "09:13", "19": "09:02", "20": "09:18", "21": "14:04", "22": "08:40", "25": "08:14", "26": "14:01", "27": "08:53", "28": "14:23"}, "Santiago Correal": {"4": "16:08", "5": "09:19", "7": "13:48", "11": "13:23", "19": "09:14", "20": "09:11", "21": "09:22", "25": "09:51", "26": "09:46"}, "Julian Chamie": {"4": "08:23", "6": "09:23", "7": "09:29", "11": "09:14", "13": "09:17", "14": "14:05", "19": "08:54", "20": "09:54", "21": "14:15", "22": "14:48", "25": "08:48", "26": "18:09", "27": "14:13", "28": "17:33"}, "Oscar Gutierrez": {"6": "09:06", "7": "09:28", "11": "08:43", "12": "09:20", "13": "08:49", "19": "08:55", "20": "09:35", "22": "09:55", "25": "14:13", "26": "14:03", "27": "20:39", "28": "09:48"}, "Alejandro Marin": {"4": "08:23", "5": "09:23", "6": "08:22", "7": "08:34", "8": "13:46", "12": "08:29", "13": "11:06", "14": "07:57", "15": "08:26", "19": "08:19", "20": "08:08", "21": "08:18", "26": "08:31", "27": "08:33", "28": "14:17", "29": "08:53"}, "Gabriel de Bedout": {"4": "08:00", "5": "08:37", "6": "08:21", "7": "08:44", "8": "08:59", "11": "08:07", "12": "09:57", "13": "09:01", "14": "08:31", "19": "08:03", "20": "11:27", "21": "08:41", "22": "09:04", "25": "08:06", "26": "08:27", "27": "11:46", "28": "12:10", "29": "08:30"}, "Godwin Zuluaga": {"4": "10:58", "5": "08:01", "6": "09:01", "7": "08:46", "11": "08:35", "12": "08:52", "13": "08:45", "14": "08:48", "19": "08:45", "20": "09:00", "21": "08:51", "22": "09:02", "25": "08:58", "26": "08:59", "27": "08:57", "28": "09:02"}, "Arturo Acuña": {"4": "07:55", "5": "09:48", "6": "11:28", "7": "09:57", "11": "09:41", "12": "08:53", "13": "10:09", "14": "09:25", "19": "09:04", "20": "09:37", "21": "07:42", "25": "09:29", "26": "10:13", "27": "09:22", "28": "09:59"}, "Antonio Fonseca Bayona": {"4": "12:33", "5": "08:29", "6": "08:36", "7": "08:35", "11": "12:24", "12": "08:32", "13": "09:20", "14": "08:37", "15": "09:03", "19": "08:43", "20": "08:50", "21": "08:53", "22": "08:42", "25": "08:42", "26": "08:51", "27": "08:57", "28": "08:50"}, "Julian Ramirez": {"4": "08:41", "5": "09:05", "6": "09:51", "7": "09:28", "11": "08:33", "12": "09:28", "13": "10:20", "14": "10:22", "19": "09:00", "20": "10:02", "21": "13:52", "22": "08:39", "25": "08:58", "26": "09:09", "27": "09:21", "28": "08:14"}, "Juan Felipe Sanchez": {"4": "07:56", "5": "07:58", "6": "08:00", "7": "07:54", "8": "07:41", "11": "07:46", "12": "07:50", "19": "07:53", "20": "07:57", "21": "08:06", "22": "08:05", "25": "07:53", "26": "10:20", "27": "07:59", "28": "07:47", "29": "07:50"}, "Sergio Gonzalez": {"5": "07:53", "6": "07:48", "7": "08:13", "8": "08:02", "11": "08:25", "12": "08:26", "13": "08:20", "14": "08:00", "15": "08:16", "19": "08:06", "20": "07:55", "21": "08:08", "22": "08:25", "25": "08:02", "26": "08:20", "27": "08:24", "28": "08:39", "29": "08:24"}};
+const GRUPOS={"Asociados y Vicepresidentes": ["Alejandro Martinez", "Enrique Vargas", "Felipe Camacho", "Pedro Duque", "Mauricio Saldarriaga", "Santiago Cardenas", "Nicolas Gomez"], "Analistas": ["Alejandro Castro", "Antonio Fonseca Bayona", "Arturo Acuña", "Esteban Franco", "Gabriel Ocampo", "Gabriel de Bedout", "Godwin Zuluaga", "Juan Camilo Santa", "Juana Mendoza", "Julian Ramirez", "Julian Chamie", "Laura Calderon", "Laura Gomez", "Oscar Gutierrez", "Salomon Peñuela", "Santiago Correal", "Omar Nassar", "Nicolas Vasquez"], "Administrativo": ["Adriana Molano", "Juan Felipe Sanchez", "Dhayra Bedoya", "Diana Avella", "Diana Medina", "Lizeth Torres", "Luz Marina Sanchez", "Maria Paula Nieto", "Camila Guerrero", "Andrey Pedraza"]};
+const resumen=[{"Empleado": "Sergio Gonzalez", "Asistencias": 18, "Ausencias": 3, "Total": 21, "Pct": 85.7}, {"Empleado": "Lizeth Torres", "Asistencias": 18, "Ausencias": 3, "Total": 21, "Pct": 85.7}, {"Empleado": "Gabriel de Bedout", "Asistencias": 18, "Ausencias": 3, "Total": 21, "Pct": 85.7}, {"Empleado": "Gabriel Ocampo", "Asistencias": 18, "Ausencias": 3, "Total": 21, "Pct": 85.7}, {"Empleado": "Antonio Fonseca Bayona", "Asistencias": 17, "Ausencias": 4, "Total": 21, "Pct": 81.0}, {"Empleado": "Esteban Franco", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Julian Ramirez", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Juan Felipe Sanchez", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Alejandro Castro", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Godwin Zuluaga", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Juan Camilo Santa", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Alejandro Marin", "Asistencias": 16, "Ausencias": 5, "Total": 21, "Pct": 76.2}, {"Empleado": "Omar Nassar", "Asistencias": 15, "Ausencias": 6, "Total": 21, "Pct": 71.4}, {"Empleado": "Arturo Acuña", "Asistencias": 15, "Ausencias": 6, "Total": 21, "Pct": 71.4}, {"Empleado": "Laura Gomez", "Asistencias": 15, "Ausencias": 6, "Total": 21, "Pct": 71.4}, {"Empleado": "Julian Chamie", "Asistencias": 14, "Ausencias": 7, "Total": 21, "Pct": 66.7}, {"Empleado": "Salomon Peñuela", "Asistencias": 14, "Ausencias": 7, "Total": 21, "Pct": 66.7}, {"Empleado": "Nicolas Gomez", "Asistencias": 14, "Ausencias": 7, "Total": 21, "Pct": 66.7}, {"Empleado": "Juana Mendoza", "Asistencias": 14, "Ausencias": 7, "Total": 21, "Pct": 66.7}, {"Empleado": "Diana Medina", "Asistencias": 13, "Ausencias": 8, "Total": 21, "Pct": 61.9}, {"Empleado": "Luz Marina Sanchez", "Asistencias": 13, "Ausencias": 8, "Total": 21, "Pct": 61.9}, {"Empleado": "Oscar Gutierrez", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Diana Avella", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Dhayra Bedoya", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Adriana Molano", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Enrique Vargas", "Asistencias": 12, "Ausencias": 9, "Total": 21, "Pct": 57.1}, {"Empleado": "Nicolas Vasquez", "Asistencias": 11, "Ausencias": 10, "Total": 21, "Pct": 52.4}, {"Empleado": "Camila Guerrero", "Asistencias": 11, "Ausencias": 10, "Total": 21, "Pct": 52.4}, {"Empleado": "Maria Paula Nieto", "Asistencias": 10, "Ausencias": 11, "Total": 21, "Pct": 47.6}, {"Empleado": "Santiago Correal", "Asistencias": 9, "Ausencias": 12, "Total": 21, "Pct": 42.9}, {"Empleado": "María Camila Murcia", "Asistencias": 9, "Ausencias": 12, "Total": 21, "Pct": 42.9}, {"Empleado": "Andrey Pedraza", "Asistencias": 9, "Ausencias": 12, "Total": 21, "Pct": 42.9}, {"Empleado": "Pedro Duque", "Asistencias": 7, "Ausencias": 14, "Total": 21, "Pct": 33.3}, {"Empleado": "Alejandro Martinez", "Asistencias": 6, "Ausencias": 15, "Total": 21, "Pct": 28.6}, {"Empleado": "Claudia Osorio", "Asistencias": 5, "Ausencias": 16, "Total": 21, "Pct": 23.8}, {"Empleado": "Carlos Cortes", "Asistencias": 4, "Ausencias": 38, "Total": 42, "Pct": 9.5}, {"Empleado": "Felipe Camacho", "Asistencias": 3, "Ausencias": 18, "Total": 21, "Pct": 14.3}, {"Empleado": "Mauricio Saldarriaga", "Asistencias": 2, "Ausencias": 19, "Total": 21, "Pct": 9.5}, {"Empleado": "Santiago Cardenas", "Asistencias": 2, "Ausencias": 19, "Total": 21, "Pct": 9.5}, {"Empleado": "Claudia Robledo", "Asistencias": 0, "Ausencias": 21, "Total": 21, "Pct": 0.0}, {"Empleado": "Maria Camila Murcia", "Asistencias": 0, "Ausencias": 21, "Total": 21, "Pct": 0.0}];
+const porDia=[{"Dia": 1, "Asistencias": 1}, {"Dia": 4, "Asistencias": 30}, {"Dia": 5, "Asistencias": 27}, {"Dia": 6, "Asistencias": 28}, {"Dia": 7, "Asistencias": 32}, {"Dia": 8, "Asistencias": 17}, {"Dia": 11, "Asistencias": 29}, {"Dia": 12, "Asistencias": 26}, {"Dia": 13, "Asistencias": 23}, {"Dia": 14, "Asistencias": 25}, {"Dia": 15, "Asistencias": 8}, {"Dia": 18, "Asistencias": 3}, {"Dia": 19, "Asistencias": 32}, {"Dia": 20, "Asistencias": 25}, {"Dia": 21, "Asistencias": 27}, {"Dia": 22, "Asistencias": 20}, {"Dia": 25, "Asistencias": 30}, {"Dia": 26, "Asistencias": 35}, {"Dia": 27, "Asistencias": 30}, {"Dia": 28, "Asistencias": 21}, {"Dia": 29, "Asistencias": 8}];
+const detalle={"Andrey Pedraza": {"4": "08:15", "7": "08:17", "11": "08:24", "12": "13:58", "13": "08:30", "14": "08:20", "19": "11:27", "25": "11:53", "29": "08:15"}, "Dhayra Bedoya": {"4": "08:12", "5": "08:34", "8": "08:28", "11": "08:30", "12": "08:34", "14": "08:26", "19": "08:10", "21": "09:17", "22": "08:25", "25": "07:52", "26": "08:38", "27": "08:35"}, "Camila Guerrero": {"6": "08:20", "7": "08:31", "8": "08:43", "11": "08:26", "13": "08:25", "15": "09:09", "19": "08:34", "20": "08:34", "25": "08:49", "26": "18:06", "27": "08:55"}, "Luz Marina Sanchez": {"4": "08:23", "5": "08:33", "6": "11:11", "8": "08:12", "11": "08:11", "12": "08:18", "13": "12:27", "19": "10:47", "20": "09:28", "21": "08:33", "25": "08:04", "26": "08:28", "27": "08:16"}, "Maria Paula Nieto": {"4": "08:24", "5": "09:17", "7": "10:16", "11": "08:17", "12": "12:03", "14": "10:44", "15": "11:46", "19": "08:22", "22": "09:09", "26": "08:46"}, "Santiago Cardenas": {"5": "08:41", "19": "08:11"}, "Mauricio Saldarriaga": {"26": "08:23", "27": "10:06"}, "Adriana Molano": {"4": "08:31", "5": "08:30", "6": "08:31", "11": "08:28", "12": "08:25", "14": "08:56", "19": "08:47", "20": "08:40", "21": "08:16", "25": "08:32", "26": "08:18", "28": "08:44"}, "Felipe Camacho": {"19": "11:41", "20": "10:42", "26": "09:38"}, "Nicolas Gomez": {"4": "08:35", "6": "17:26", "7": "11:14", "8": "09:59", "11": "08:51", "12": "09:34", "13": "10:01", "14": "11:10", "19": "07:57", "20": "09:59", "21": "09:18", "25": "08:58", "26": "09:43", "27": "10:04"}, "Diana Medina": {"4": "08:49", "6": "08:52", "7": "08:53", "11": "08:37", "13": "08:38", "14": "08:54", "19": "08:57", "21": "09:09", "22": "09:18", "26": "08:43", "27": "08:44", "28": "08:51", "29": "08:52"}, "Alejandro Martinez": {"5": "16:10", "6": "11:48", "7": "08:46", "21": "10:38", "26": "16:46", "27": "09:28"}, "Enrique Vargas": {"4": "08:31", "6": "11:54", "7": "09:36", "8": "09:03", "11": "09:40", "12": "09:24", "14": "08:50", "19": "08:05", "20": "08:55", "25": "08:27", "26": "12:29", "27": "09:57"}, "Diana Avella": {"4": "08:20", "5": "08:16", "8": "11:58", "11": "08:10", "12": "07:57", "15": "08:16", "19": "12:52", "20": "11:05", "21": "08:30", "25": "07:48", "26": "08:27", "27": "08:01"}, "Nicolas Vasquez": {"4": "08:32", "6": "13:26", "7": "12:26", "11": "14:18", "13": "09:01", "14": "09:00", "19": "10:44", "21": "14:09", "25": "14:41", "26": "11:04", "28": "13:52"}, "Carlos Cortes": {"5": "15:43", "6": "07:56", "7": "08:25", "27": "10:00"}, "Laura Gomez": {"4": "07:49", "5": "08:15", "6": "08:29", "7": "08:32", "8": "08:40", "12": "08:22", "13": "08:30", "14": "08:25", "19": "08:42", "20": "08:53", "21": "08:35", "22": "08:47", "25": "08:26", "26": "08:02", "27": "08:33"}, "Gabriel Ocampo": {"4": "08:00", "5": "07:11", "6": "08:21", "7": "08:58", "8": "08:59", "11": "07:05", "12": "08:22", "13": "10:14", "14": "07:52", "19": "07:09", "20": "09:32", "21": "08:08", "22": "09:23", "25": "08:02", "26": "09:29", "27": "07:32", "28": "09:48", "29": "09:15"}, "Pedro Duque": {"4": "11:20", "5": "08:30", "6": "08:42", "7": "09:42", "8": "10:56", "25": "08:20", "26": "09:55"}, "Lizeth Torres": {"4": "08:40", "5": "08:36", "6": "08:40", "7": "08:44", "8": "08:02", "11": "08:28", "12": "08:24", "13": "08:29", "14": "08:22", "19": "08:39", "20": "08:38", "21": "08:31", "22": "08:32", "25": "08:23", "26": "08:18", "27": "08:20", "28": "08:26", "29": "08:24"}, "Claudia Robledo": {}, "Omar Nassar": {"4": "14:02", "6": "10:46", "7": "15:20", "8": "11:12", "11": "13:28", "13": "10:56", "14": "11:02", "15": "12:45", "18": "17:44", "19": "13:53", "20": "21:08", "21": "10:08", "22": "10:36", "25": "09:30", "27": "14:06"}, "Juana Mendoza": {"4": "07:53", "5": "09:16", "6": "08:35", "7": "09:21", "8": "08:47", "11": "08:04", "18": "06:38", "19": "08:34", "21": "10:30", "22": "09:02", "25": "08:38", "26": "08:40", "27": "08:48", "28": "09:31"}, "Salomon Peñuela": {"4": "11:52", "5": "07:58", "7": "07:27", "11": "07:58", "12": "13:52", "13": "08:03", "14": "08:16", "19": "07:40", "21": "08:05", "22": "07:41", "25": "10:43", "26": "13:53", "27": "08:58", "28": "09:07"}, "Claudia Osorio": {"6": "10:34", "7": "13:47", "12": "06:47", "21": "10:35", "26": "09:15"}, "Maria Camila Murcia": {}, "María Camila Murcia": {"4": "07:40", "5": "07:52", "7": "07:38", "12": "08:17", "14": "08:04", "25": "07:32", "26": "08:02", "27": "08:14", "28": "07:38"}, "Juan Camilo Santa": {"1": "11:34", "4": "08:21", "5": "09:13", "6": "14:08", "7": "10:18", "11": "19:59", "12": "13:33", "13": "13:14", "15": "08:56", "18": "11:29", "20": "09:20", "22": "09:15", "25": "08:29", "26": "08:51", "27": "19:36", "28": "13:54"}, "Esteban Franco": {"4": "07:56", "5": "08:34", "7": "09:40", "8": "08:57", "11": "09:34", "12": "09:33", "13": "14:12", "14": "14:12", "19": "09:20", "20": "09:11", "21": "14:11", "22": "15:47", "25": "09:01", "26": "08:41", "27": "14:08", "28": "09:24"}, "Alejandro Castro": {"4": "10:36", "5": "11:00", "6": "09:25", "7": "08:56", "11": "08:48", "12": "14:03", "13": "09:44", "14": "09:13", "19": "09:02", "20": "09:18", "21": "14:04", "22": "08:40", "25": "08:14", "26": "14:01", "27": "08:53", "28": "14:23"}, "Santiago Correal": {"4": "16:08", "5": "09:19", "7": "13:48", "11": "13:23", "19": "09:14", "20": "09:11", "21": "09:22", "25": "09:51", "26": "09:46"}, "Julian Chamie": {"4": "08:23", "6": "09:23", "7": "09:29", "11": "09:14", "13": "09:17", "14": "14:05", "19": "08:54", "20": "09:54", "21": "14:15", "22": "14:48", "25": "08:48", "26": "18:09", "27": "14:13", "28": "17:33"}, "Oscar Gutierrez": {"6": "09:06", "7": "09:28", "11": "08:43", "12": "09:20", "13": "08:49", "19": "08:55", "20": "09:35", "22": "09:55", "25": "14:13", "26": "14:03", "27": "20:39", "28": "09:48"}, "Alejandro Marin": {"4": "08:23", "5": "09:23", "6": "08:22", "7": "08:34", "8": "13:46", "12": "08:29", "13": "11:06", "14": "07:57", "15": "08:26", "19": "08:19", "20": "08:08", "21": "08:18", "26": "08:31", "27": "08:33", "28": "14:17", "29": "08:53"}, "Gabriel de Bedout": {"4": "08:00", "5": "08:37", "6": "08:21", "7": "08:44", "8": "08:59", "11": "08:07", "12": "09:57", "13": "09:01", "14": "08:31", "19": "08:03", "20": "11:27", "21": "08:41", "22": "09:04", "25": "08:06", "26": "08:27", "27": "11:46", "28": "12:10", "29": "08:30"}, "Godwin Zuluaga": {"4": "10:58", "5": "08:01", "6": "09:01", "7": "08:46", "11": "08:35", "12": "08:52", "13": "08:45", "14": "08:48", "19": "08:45", "20": "09:00", "21": "08:51", "22": "09:02", "25": "08:58", "26": "08:59", "27": "08:57", "28": "09:02"}, "Arturo Acuña": {"4": "07:55", "5": "09:48", "6": "11:28", "7": "09:57", "11": "09:41", "12": "08:53", "13": "10:09", "14": "09:25", "19": "09:04", "20": "09:37", "21": "07:42", "25": "09:29", "26": "10:13", "27": "09:22", "28": "09:59"}, "Antonio Fonseca Bayona": {"4": "12:33", "5": "08:29", "6": "08:36", "7": "08:35", "11": "12:24", "12": "08:32", "13": "09:20", "14": "08:37", "15": "09:03", "19": "08:43", "20": "08:50", "21": "08:53", "22": "08:42", "25": "08:42", "26": "08:51", "27": "08:57", "28": "08:50"}, "Julian Ramirez": {"4": "08:41", "5": "09:05", "6": "09:51", "7": "09:28", "11": "08:33", "12": "09:28", "13": "10:20", "14": "10:22", "19": "09:00", "20": "10:02", "21": "13:52", "22": "08:39", "25": "08:58", "26": "09:09", "27": "09:21", "28": "08:14"}, "Juan Felipe Sanchez": {"4": "07:56", "5": "07:58", "6": "08:00", "7": "07:54", "8": "07:41", "11": "07:46", "12": "07:50", "19": "07:53", "20": "07:57", "21": "08:06", "22": "08:05", "25": "07:53", "26": "10:20", "27": "07:59", "28": "07:47", "29": "07:50"}, "Sergio Gonzalez": {"5": "07:53", "6": "07:48", "7": "08:13", "8": "08:02", "11": "08:25", "12": "08:26", "13": "08:20", "14": "08:00", "15": "08:16", "19": "08:06", "20": "07:55", "21": "08:08", "22": "08:25", "25": "08:02", "26": "08:20", "27": "08:24", "28": "08:39", "29": "08:24"}};
 let justificaciones={};
 let modalEmpleado='',modalDia=0,modalFecha='';
 
 async function sbGet(){const r=await fetch(`${SUPABASE_URL}/rest/v1/justificaciones?select=*&fecha=gte.${ANIO}-${String(MES).padStart(2,'0')}-01&fecha=lte.${ANIO}-${String(MES).padStart(2,'0')}-31`,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});return r.json();}
-async function sbUpsert(e,f,m){const r=await fetch(`${SUPABASE_URL}/rest/v1/justificaciones`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates'},body:JSON.stringify({empleado:e,fecha:f,motivo:m})});return r.ok;}
+async function sbUpsert(e,f,m){const r=await fetch(`${SUPABASE_URL}/rest/v1/justificaciones`,{method:'POST',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({empleado:e,fecha:f,motivo:m})});return r.ok||r.status===201||r.status===200||r.status===204;}
 async function sbDelete(e,f){const r=await fetch(`${SUPABASE_URL}/rest/v1/justificaciones?empleado=eq.${encodeURIComponent(e)}&fecha=eq.${f}`,{method:'DELETE',headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`}});return r.ok;}
 
 function badge(p){if(p>=70)return`<span class="badge bg">${p}%</span>`;if(p>=40)return`<span class="badge ba">${p}%</span>`;return`<span class="badge br">${p}%</span>`;}
@@ -299,6 +305,51 @@ async function sw(btn,name){
 
 // ── FDS DATA ──
 const FDS_DATA = {
+  julio:{
+    labels:["04-Jul","05-Jul"],
+    users:[
+      {n:"Alejandro Castro",    h:[0.32,0.32]},
+      {n:"Antonio Fonseca",     h:[0.9,1.34]},
+      {n:"Arturo Acña",        h:[0.0,0.38]},
+      {n:"Esteban Franco",      h:[1.94,0.48]},
+      {n:"Gabriel Ocampo",      h:[1.92,1.82]},
+      {n:"Gabriel de Bedout",   h:[1.83,0.18]},
+      {n:"Godwin Zuluaga",      h:[2.09,2.85]},
+      {n:"Juan Camilo Santa",   h:[1.14,0.4]},
+      {n:"Juana Mendoza",       h:[0.07,0.01]},
+      {n:"Julian Chamie",       h:[0.0,0.0]},
+      {n:"Julian Ramirez",      h:[0.0,3.64]},
+      {n:"Laura Calderon",      h:[0.0,0.0]},
+      {n:"Nicolas Vasquez",     h:[0.28,0.0]},
+      {n:"Omar Nassar",         h:[0.0,0.0]},
+      {n:"Oscar Gutierrez",     h:[0.24,0.49]},
+      {n:"Salomon Peñuela",     h:[2.9,1.37]},
+      {n:"Santiago Correal",    h:[0.0,0.0]},
+      {n:"Santiago Zea",        h:[0.0,0.0]}
+    ]
+  },
+  junio:{
+    labels:["06-Jun","07-Jun","08-Jun","13-Jun","14-Jun","15-Jun","20-Jun","21-Jun","27-Jun","28-Jun","29-Jun"],
+    users:[
+      {n:"Alejandro Castro",    h:[0.95,4.23,6.04,4.13,5.16,5.86,0.04,0.28,0.38,0.28,0.62]},
+      {n:"Antonio Fonseca",     h:[0.03,0.0,0.0,5.5,11.58,5.69,4.34,2.8,0.18,0.07,0.01]},
+      {n:"Arturo Acuña",        h:[2.21,2.03,5.32,1.21,0.05,1.49,0.75,1.68,0.0,0.0,0.66]},
+      {n:"Esteban Franco",      h:[0.44,0.76,1.73,3.01,0.0,0.8,6.22,0.27,1.2,0.0,2.14]},
+      {n:"Gabriel Ocampo",      h:[1.91,1.51,1.21,4.06,2.81,6.04,0.84,0.07,1.77,0.65,1.32]},
+      {n:"Gabriel de Bedout",   h:[0.0,0.0,0.4,3.3,4.09,4.64,0.97,0.1,3.19,0.0,2.06]},
+      {n:"Godwin Zuluaga",      h:[2.08,0.37,0.0,5.24,0.45,3.82,0.61,1.15,0.24,0.81,2.87]},
+      {n:"Juan Camilo Santa",   h:[3.11,3.72,1.36,1.07,3.48,3.98,1.2,2.94,0.54,0.05,0.24]},
+      {n:"Juana Mendoza",       h:[0.73,0.0,0.35,5.98,4.21,4.48,0.99,0.63,0.4,0.0,0.17]},
+      {n:"Julian Chamie",       h:[0.0,0.0,0.14,0.47,0.15,0.0,0.0,0.0,0.37,0.06,0.33]},
+      {n:"Julian Ramirez",      h:[1.04,1.77,3.35,2.19,1.59,3.98,0.04,0.43,0.37,2.66,5.66]},
+      {n:"Laura Calderon",      h:[0.0,0.19,0.58,5.21,6.77,8.79,0.73,0.0,0.0,0.0,0.0]},
+      {n:"Nicolas Vasquez",     h:[0.11,0.33,0.21,1.34,1.52,4.88,0.0,0.45,0.01,0.0,0.8]},
+      {n:"Omar Nassar",         h:[0.85,0.01,0.0,1.71,0.43,1.03,0.01,0.18,0.01,0.0,0.38]},
+      {n:"Oscar Gutierrez",     h:[0.24,0.47,0.12,1.16,0.28,1.39,0.61,0.31,0.03,0.3,0.07]},
+      {n:"Salomon Peñuela",     h:[1.16,0.17,2.46,4.16,3.71,2.27,5.75,0.0,0.3,0.18,4.18]},
+      {n:"Santiago Correal",    h:[1.93,0.36,0.78,6.08,4.5,2.92,0.01,0.76,0.5,0.0,1.86]}
+    ]
+  },
   marzo:{
     labels:["01-Mar","07-Mar","08-Mar","14-Mar","15-Mar","21-Mar","22-Mar","23-Mar","28-Mar","29-Mar"],
     users:[
@@ -438,18 +489,22 @@ function drawFdsCharts(mes){
 }
 
 function drawFdsComp(){
-  const names=[...new Set([...FDS_DATA.marzo.users,...FDS_DATA.abril.users,...FDS_DATA.mayo.users].map(u=>u.n))].sort();
+  const names=[...new Set([...FDS_DATA.julio.users,...FDS_DATA.junio.users,...FDS_DATA.marzo.users,...FDS_DATA.abril.users,...FDS_DATA.mayo.users].map(u=>u.n))].sort();
+  const julH=Object.fromEntries(FDS_DATA.julio.users.map(u=>[u.n,fTot(u)]));
+  const juH=Object.fromEntries(FDS_DATA.junio.users.map(u=>[u.n,fTot(u)]));
   const mH=Object.fromEntries(FDS_DATA.marzo.users.map(u=>[u.n,fTot(u)]));
   const aH=Object.fromEntries(FDS_DATA.abril.users.map(u=>[u.n,fTot(u)]));
   const myH=Object.fromEntries(FDS_DATA.mayo.users.map(u=>[u.n,fTot(u)]));
-  const activos=names.filter(n=>(mH[n]||0)+(aH[n]||0)+(myH[n]||0)>0);
+  const activos=names.filter(n=>(julH[n]||0)+(juH[n]||0)+(mH[n]||0)+(aH[n]||0)+(myH[n]||0)>0);
   if(fdsCharts.comp) fdsCharts.comp.destroy();
   fdsCharts.comp=new Chart(document.getElementById('ch-comp-fds'),{
     type:'bar',
     data:{labels:activos,datasets:[
-      {label:'Marzo', data:activos.map(n=>+(mH[n]||0).toFixed(1)),backgroundColor:'#193457',borderRadius:2},
-      {label:'Abril',  data:activos.map(n=>+(aH[n]||0).toFixed(1)),backgroundColor:'#3266AC',borderRadius:2},
+      {label:'Julio',  data:activos.map(n=>+(julH[n]||0).toFixed(1)),backgroundColor:'#2E8B57',borderRadius:2},
+      {label:'Junio',  data:activos.map(n=>+(juH[n]||0).toFixed(1)),backgroundColor:'#1B6B4A',borderRadius:2},
       {label:'Mayo',   data:activos.map(n=>+(myH[n]||0).toFixed(1)),backgroundColor:'#6A9FD8',borderRadius:2},
+      {label:'Abril',  data:activos.map(n=>+(aH[n]||0).toFixed(1)),backgroundColor:'#3266AC',borderRadius:2},
+      {label:'Marzo', data:activos.map(n=>+(mH[n]||0).toFixed(1)),backgroundColor:'#193457',borderRadius:2},
     ]},
     options:{responsive:true,maintainAspectRatio:false,
       plugins:{legend:{position:'top',labels:{font:{size:11}}}},
@@ -457,15 +512,17 @@ function drawFdsComp(){
         y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},callback:v=>v+'h'}}}}
   });
   const rows=activos.map(n=>{
-    const m=+(mH[n]||0).toFixed(1),a=+(aH[n]||0).toFixed(1),my=+(myH[n]||0).toFixed(1),tot=+(m+a+my).toFixed(1);
+    const jul=+(julH[n]||0).toFixed(1),ju=+(juH[n]||0).toFixed(1),m=+(mH[n]||0).toFixed(1),a=+(aH[n]||0).toFixed(1),my=+(myH[n]||0).toFixed(1),tot=+(jul+ju+m+a+my).toFixed(1);
     return `<tr><td class="nm">${n}</td>
-      <td><span class="bdg ${fCls(m)}">${m}h</span></td>
-      <td><span class="bdg ${fCls(a)}">${a}h</span></td>
+      <td><span class="bdg ${fCls(jul)}">${jul}h</span></td>
+      <td><span class="bdg ${fCls(ju)}">${ju}h</span></td>
       <td><span class="bdg ${fCls(my)}">${my}h</span></td>
+      <td><span class="bdg ${fCls(a)}">${a}h</span></td>
+      <td><span class="bdg ${fCls(m)}">${m}h</span></td>
       <td style="font-weight:500">${tot}h</td></tr>`;
   }).join('');
   document.getElementById('tbl-comp-fds').innerHTML=`<table class="fds-tbl">
-    <thead><tr><th class="nm">Persona</th><th>Marzo</th><th>Abril</th><th>Mayo</th><th>Total</th></tr></thead>
+    <thead><tr><th class="nm">Persona</th><th>Julio</th><th>Junio</th><th>Mayo</th><th>Abril</th><th>Marzo</th><th>Total</th></tr></thead>
     <tbody>${rows}</tbody></table>`;
 }
 
@@ -480,10 +537,10 @@ function swFds(btn,name){
 }
 
 // Init FDS panels
-['marzo','abril','mayo'].forEach(mes=>{
+['julio','junio','marzo','abril','mayo'].forEach(mes=>{
   document.getElementById(`fds-${mes}`).innerHTML=buildFdsPanel(mes);
 });
-setTimeout(()=>drawFdsCharts('marzo'),150);
+setTimeout(()=>drawFdsCharts('julio'),150);
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarModal();});
 document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg'))cerrarModal();});
