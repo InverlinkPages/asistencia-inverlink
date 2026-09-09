@@ -160,7 +160,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
 
   <div id="tab-actividad" class="panel">
     <div class="card" style="margin-bottom:1rem">
-      <div class="card-title">Actividad M365 por día — Agosto 2026</div>
+      <div class="card-title">Actividad M365 por día — Septiembre 2026</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:1rem">Horas de actividad digital (Teams, SharePoint, Email) por persona y día. Incluye días hábiles y fines de semana.</div>
       <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center">
         <span style="font-size:11px;font-weight:600;color:var(--muted)">FILTRAR:</span>
@@ -345,6 +345,24 @@ async function sw(btn,name){
 
 // ── FDS DATA ──
 const FDS_DATA = {
+  septiembre_diario:{
+    labels:["1-Sep","2-Sep","3-Sep","4-Sep","5-Sep","6-Sep","7-Sep"],
+    users:[
+      {n:"Antonio Fonseca Bayona", h:[10.15,9.53,8.55,5.21,7.23,5.71,0.0]},
+      {n:"Esteban Franco", h:[9.89,6.92,7.48,2.03,1.51,0.11,0.0]},
+      {n:"Gabriel Ocampo", h:[9.47,11.79,6.32,7.11,0.0,0.19,0.0]},
+      {n:"Gabriel de Bedout", h:[6.18,6.53,7.14,4.38,0.0,0.0,0.0]},
+      {n:"Godwin Zuluaga", h:[9.47,11.98,3.67,1.9,4.78,0.03,0.0]},
+      {n:"Juan Camilo Santa", h:[8.79,9.93,8.78,3.05,0.0,0.72,0.0]},
+      {n:"Juana Mendoza", h:[7.29,6.39,8.67,5.48,0.75,2.48,0.0]},
+      {n:"Julian Chamie", h:[5.91,6.59,8.26,3.32,0.29,0.0,0.0]},
+      {n:"Julian Ramirez", h:[3.8,3.46,4.02,2.03,0.29,1.08,0.0]},
+      {n:"Nicolas Vasquez", h:[9.62,7.93,8.87,3.06,0.44,0.44,0.0]},
+      {n:"Omar Nassar", h:[4.41,6.52,2.18,1.81,0.0,0.29,0.0]},
+      {n:"Oscar Gutierrez", h:[2.7,10.05,6.74,5.32,0.07,0.0,0.0]},
+      {n:"Salomon Peñuela", h:[13.0,8.88,11.95,3.73,4.93,1.79,0.0]}
+    ]
+  },
   agosto_diario:{
     labels:["1-Ago","2-Ago","3-Ago","4-Ago","5-Ago","6-Ago","7-Ago","8-Ago","9-Ago","10-Ago","11-Ago","12-Ago","13-Ago","14-Ago","15-Ago","16-Ago","17-Ago","18-Ago","19-Ago","20-Ago","21-Ago","22-Ago","23-Ago","24-Ago","25-Ago","26-Ago","27-Ago","28-Ago","29-Ago","30-Ago","31-Ago"],
     users:[
@@ -688,7 +706,8 @@ setTimeout(()=>drawFdsCharts('septiembre'),150);
 
 
 // ── ACTIVIDAD DIARIA ──
-const ACT_DATA = FDS_DATA.agosto_diario;
+const _ACT_MES = document.querySelector('.header h1')?.textContent?.includes('Septiembre') ? 'septiembre_diario' : 'agosto_diario';
+const ACT_DATA = FDS_DATA[_ACT_MES] || FDS_DATA.agosto_diario;
 const DIAS_FDS_AGO = [0,1,5,6,9,10,14,15,16,19,20,22,23,26,27,28,29,30]; // índices fines de semana
 let actChart = null;
 
@@ -719,7 +738,12 @@ function renderActividad(){
       })
     },
     options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10}},
+      plugins:{legend:{position:'top',labels:{font:{size:10},boxWidth:10},onClick:(e,legendItem,legend)=>{
+          const idx=legendItem.datasetIndex;
+          const meta=legend.chart.getDatasetMeta(idx);
+          meta.hidden=!meta.hidden;
+          legend.chart.update();
+        }},
         tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.raw}h`}}},
       scales:{x:{grid:{display:false},ticks:{font:{size:9},autoSkip:false,maxRotation:45},stacked:false},
         y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},callback:v=>v+'h'}}}}
