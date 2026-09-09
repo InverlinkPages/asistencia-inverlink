@@ -207,6 +207,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
 
 <script>
 const SUPABASE_URL="https://jztiojajhwwdvwwytpcc.supabase.co";
+const DIA_CORTE=8;
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dGlvamFqaHd3ZHZ3d3l0cGNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjU4NTAsImV4cCI6MjA5NTY0MTg1MH0.LYEAV_N77xTbN_QsvbHXfoOJTSmM0QH7tq78yaxjisg";
 const MES=9,ANIO=2026,DOW_INICIO=1,DIAS_MES=30;
 const DH=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
@@ -278,14 +279,14 @@ function buildCal(emp){
     const fecha=ff(d);
     const just=getJust(emp,d);
     let cls,lbl;
-    if(fd){cls='finde';lbl=d;}
+    if(d>DIA_CORTE){cls='empty';lbl=`<span style="color:#e0e0e0">${d}</span>`;}
+    else if(fd){cls='finde';lbl=d;}
     else if(hora){cls='si';lbl=`${d}<span class="hora">${hora}</span>`;}
     else if(just){cls='justificado';lbl=`${d}<span class="hora">${just.substring(0,6)}</span>`;}
     else{cls='no';lbl=d;}
-    const oc=(!fd&&!hora)?`onclick="abrirModal('${emp.replace(/'/g,"\'")}', ${d},'${fecha}')"` :'';
+    const oc=(d<=DIA_CORTE&&!fd&&!hora)?`onclick="abrirModal('${emp.replace(/'/g,"\'")}',${d},'${fecha}')"`:'';
     h+=`<div class="cal-d ${cls}" ${oc} title="${just||''}">${lbl}</div>`;
-  }
-  h+=`</div></div>`;return h;
+  }h+=`</div></div>`;return h;
 }
 
 function rCal(emps){document.getElementById('empGrid').innerHTML=emps.map(e=>buildCal(e)).join('');}
