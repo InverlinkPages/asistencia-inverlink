@@ -164,7 +164,8 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
       <button class="tab2" onclick="swFds(this,'fds-marzo')">Marzo</button>
       <button class="tab2" onclick="swFds(this,'fds-comp')">Comparativo</button>
     </div>
-    <div id="fds-agosto" class="fds-panel active"></div>
+    <div id="fds-septiembre" class="fds-panel active"></div>
+    <div id="fds-agosto" class="fds-panel"></div>
     <div id="fds-julio" class="fds-panel"></div>
     <div id="fds-junio" class="fds-panel"></div>
     <div id="fds-marzo" class="fds-panel"></div>
@@ -173,6 +174,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
     <div id="fds-comp" class="fds-panel">
       <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center">
         <span style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Meses:</span>
+        <button class="mes-fil active" data-mes="septiembre" onclick="toggleMesFil(this)">Sep</button>
         <button class="mes-fil active" data-mes="agosto" onclick="toggleMesFil(this)">Agosto</button>
         <button class="mes-fil active" data-mes="julio" onclick="toggleMesFil(this)">Julio</button>
         <button class="mes-fil active" data-mes="junio" onclick="toggleMesFil(this)">Junio</button>
@@ -207,7 +209,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
 
 <script>
 const SUPABASE_URL="https://jztiojajhwwdvwwytpcc.supabase.co";
-const DIA_CORTE=8;
+const DIA_CORTE=9;
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dGlvamFqaHd3ZHZ3d3l0cGNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjU4NTAsImV4cCI6MjA5NTY0MTg1MH0.LYEAV_N77xTbN_QsvbHXfoOJTSmM0QH7tq78yaxjisg";
 const MES=9,ANIO=2026,DOW_INICIO=1,DIAS_MES=30;
 const DH=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
@@ -323,6 +325,29 @@ async function sw(btn,name){
 
 // ── FDS DATA ──
 const FDS_DATA = {
+  septiembre:{
+    labels:["05-Sep","06-Sep"],
+    users:[
+      {n:"Alejandro Castro",    h:[0.0,0.0]},
+      {n:"Antonio Fonseca",     h:[7.23,5.71]},
+      {n:"Arturo Acuña",        h:[0.0,0.0]},
+      {n:"Esteban Franco",      h:[1.31,0.11]},
+      {n:"Gabriel Ocampo",      h:[0.0,0.19]},
+      {n:"Gabriel de Bedout",   h:[0.0,0.0]},
+      {n:"Godwin Zuluaga",      h:[4.77,0.03]},
+      {n:"Juan Camilo Santa",   h:[0.0,0.72]},
+      {n:"Juana Mendoza",       h:[0.55,2.48]},
+      {n:"Julian Chamie",       h:[0.0,0.0]},
+      {n:"Julian Ramirez",      h:[0.29,1.08]},
+      {n:"Laura Calderon",      h:[0.0,0.0]},
+      {n:"Nicolas Vasquez",     h:[0.44,0.44]},
+      {n:"Omar Nassar",         h:[0.0,0.29]},
+      {n:"Oscar Gutierrez",     h:[0.07,0.0]},
+      {n:"Salomon Peñuela",     h:[4.61,1.79]},
+      {n:"Santiago Correal",    h:[0.0,0.0]},
+      {n:"Santiago Zea",        h:[0.0,0.0]}
+    ]
+  },
   agosto:{
     labels:["01-Ago","02-Ago","07-Ago","08-Ago","09-Ago","15-Ago","16-Ago","17-Ago","23-Ago","24-Ago","29-Ago","30-Ago"],
     users:[
@@ -541,7 +566,8 @@ function toggleTodosMeses(todos){
   drawFdsComp();
 }
 function drawFdsComp(){
-  const names=[...new Set([...FDS_DATA.agosto.users,...FDS_DATA.julio.users,...FDS_DATA.junio.users,...FDS_DATA.marzo.users,...FDS_DATA.abril.users,...FDS_DATA.mayo.users].map(u=>u.n))].sort();
+  const names=[...new Set([...FDS_DATA.septiembre.users,...FDS_DATA.agosto.users,...FDS_DATA.julio.users,...FDS_DATA.junio.users,...FDS_DATA.marzo.users,...FDS_DATA.abril.users,...FDS_DATA.mayo.users].map(u=>u.n))].sort();
+  const sepH=Object.fromEntries(FDS_DATA.septiembre.users.map(u=>[u.n,fTot(u)]));
   const agoH=Object.fromEntries(FDS_DATA.agosto.users.map(u=>[u.n,fTot(u)]));
   const julH=Object.fromEntries(FDS_DATA.julio.users.map(u=>[u.n,fTot(u)]));
   const juH=Object.fromEntries(FDS_DATA.junio.users.map(u=>[u.n,fTot(u)]));
@@ -549,16 +575,17 @@ function drawFdsComp(){
   const aH=Object.fromEntries(FDS_DATA.abril.users.map(u=>[u.n,fTot(u)]));
   const myH=Object.fromEntries(FDS_DATA.mayo.users.map(u=>[u.n,fTot(u)]));
   const mesesAct=getMesesActivos();
+  const usaSep=mesesAct.includes('septiembre');
   const usaAgo=mesesAct.includes('agosto');
   const usaJul=mesesAct.includes('julio'),usaJu=mesesAct.includes('junio'),usaMy=mesesAct.includes('mayo'),usaA=mesesAct.includes('abril'),usaM=mesesAct.includes('marzo');
   // Ordenar por total de meses seleccionados descendente
   const activos=names
     .filter(n=>{
-      const tot=(usaAgo?agoH[n]||0:0)+(usaJul?julH[n]||0:0)+(usaJu?juH[n]||0:0)+(usaMy?myH[n]||0:0)+(usaA?aH[n]||0:0)+(usaM?mH[n]||0:0);
+      const tot=(usaSep?sepH[n]||0:0)+(usaAgo?agoH[n]||0:0)+(usaJul?julH[n]||0:0)+(usaJu?juH[n]||0:0)+(usaMy?myH[n]||0:0)+(usaA?aH[n]||0:0)+(usaM?mH[n]||0:0);
       return tot>0;
     })
     .map(n=>{
-      const tot=(usaAgo?agoH[n]||0:0)+(usaJul?julH[n]||0:0)+(usaJu?juH[n]||0:0)+(usaMy?myH[n]||0:0)+(usaA?aH[n]||0:0)+(usaM?mH[n]||0:0);
+      const tot=(usaSep?sepH[n]||0:0)+(usaAgo?agoH[n]||0:0)+(usaJul?julH[n]||0:0)+(usaJu?juH[n]||0:0)+(usaMy?myH[n]||0:0)+(usaA?aH[n]||0:0)+(usaM?mH[n]||0:0);
       return{n,tot};
     })
     .sort((a,b)=>b.tot-a.tot)
@@ -567,6 +594,7 @@ function drawFdsComp(){
   fdsCharts.comp=new Chart(document.getElementById('ch-comp-fds'),{
     type:'bar',
     data:{labels:activos,datasets:[
+      ...(usaSep?[{label:'Sep', data:activos.map(n=>+(sepH[n]||0).toFixed(1)),backgroundColor:'#0369A1',borderRadius:2}]:[]),
       ...(usaAgo?[{label:'Agosto', data:activos.map(n=>+(agoH[n]||0).toFixed(1)),backgroundColor:'#0D9488',borderRadius:2}]:[]),
       ...(usaJul?[{label:'Julio',  data:activos.map(n=>+(julH[n]||0).toFixed(1)),backgroundColor:'#2E8B57',borderRadius:2}]:[]),
       ...(usaJu? [{label:'Junio',  data:activos.map(n=>+(juH[n]||0).toFixed(1)),backgroundColor:'#1B6B4A',borderRadius:2}]:[]),
@@ -580,9 +608,9 @@ function drawFdsComp(){
         y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{font:{size:10},callback:v=>v+'h'}}}}
   });
   const rows=activos.map(n=>{
-    const ago=usaAgo?+(agoH[n]||0).toFixed(1):null,jul=usaJul?+(julH[n]||0).toFixed(1):null,ju=usaJu?+(juH[n]||0).toFixed(1):null,my=usaMy?+(myH[n]||0).toFixed(1):null,a=usaA?+(aH[n]||0).toFixed(1):null,m=usaM?+(mH[n]||0).toFixed(1):null;
-    const tot=+((ago||0)+(jul||0)+(ju||0)+(my||0)+(a||0)+(m||0)).toFixed(1);
-    const tieneRojo=(ago>15)||(jul>15)||(ju>15)||(my>15)||(a>15)||(m>15);
+    const sep=usaSep?+(sepH[n]||0).toFixed(1):null,ago=usaAgo?+(agoH[n]||0).toFixed(1):null,jul=usaJul?+(julH[n]||0).toFixed(1):null,ju=usaJu?+(juH[n]||0).toFixed(1):null,my=usaMy?+(myH[n]||0).toFixed(1):null,a=usaA?+(aH[n]||0).toFixed(1):null,m=usaM?+(mH[n]||0).toFixed(1):null;
+    const tot=+((sep||0)+(ago||0)+(jul||0)+(ju||0)+(my||0)+(a||0)+(m||0)).toFixed(1);
+    const tieneRojo=(sep>15)||(ago>15)||(jul>15)||(ju>15)||(my>15)||(a>15)||(m>15);
     const rowStyle=tieneRojo?'background:linear-gradient(90deg,#fff5f5 0%,#fff 40%);border-left:3px solid #B91C1C':'';
     const totStyle=tot>50?'color:#B91C1C;font-weight:700':tot>30?'color:#8B5E0A;font-weight:600':'font-weight:600';
     return `<tr style="${rowStyle}">
@@ -594,7 +622,7 @@ function drawFdsComp(){
       ${usaM?`<td><span class="bdg ${fCls(m)}">${m}h</span></td>`:''}
       <td style="${totStyle}">${tot}h</td></tr>`;
   }).join('');
-  const thCols=[['Agosto',usaAgo],['Julio',usaJul],['Junio',usaJu],['Mayo',usaMy],['Abril',usaA],['Marzo',usaM]].filter(x=>x[1]).map(x=>`<th>${x[0]}</th>`).join('');
+  const thCols=[['Sep',usaSep],['Agosto',usaAgo],['Julio',usaJul],['Junio',usaJu],['Mayo',usaMy],['Abril',usaA],['Marzo',usaM]].filter(x=>x[1]).map(x=>`<th>${x[0]}</th>`).join('');
   document.getElementById('tbl-comp-fds').innerHTML=`
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:#888">
       <span style="color:#B91C1C;font-size:14px">●</span> Persona con al menos un mes en rojo (&gt;15h) · Ordenado por total descendente
@@ -615,10 +643,10 @@ function swFds(btn,name){
 }
 
 // Init FDS panels
-['agosto','julio','junio','marzo','abril','mayo'].forEach(mes=>{
+['septiembre','agosto','julio','junio','marzo','abril','mayo'].forEach(mes=>{
   document.getElementById(`fds-${mes}`).innerHTML=buildFdsPanel(mes);
 });
-setTimeout(()=>drawFdsCharts('agosto'),150);
+setTimeout(()=>drawFdsCharts('septiembre'),150);
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarModal();});
 document.getElementById('modalBg').addEventListener('click',e=>{if(e.target===document.getElementById('modalBg'))cerrarModal();});
