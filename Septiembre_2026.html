@@ -226,7 +226,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
 <div class="toast" id="toast"></div>
 
 <script>
-const DIA_CORTE=20;
+const DIA_CORTE=24;
 const SUPABASE_URL="https://jztiojajhwwdvwwytpcc.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dGlvamFqaHd3ZHZ3d3l0cGNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjU4NTAsImV4cCI6MjA5NTY0MTg1MH0.LYEAV_N77xTbN_QsvbHXfoOJTSmM0QH7tq78yaxjisg";
 const MES=9,ANIO=2026,DOW_INICIO=1,DIAS_MES=30;
@@ -345,27 +345,27 @@ async function sw(btn,name){
 // ── FDS DATA ──
 const FDS_DATA = {
   septiembre:{
-    labels:["5-Sep","6-Sep"],
+    labels:["5-Sep","6-Sep","12-Sep","13-Sep","19-Sep","20-Sep"],
     users:[
-      {n:"Antonio Fonseca Bayona", h:[8.5,3.05]},
-      {n:"Emilio Escorcia", h:[1.83,0.67]},
-      {n:"Esteban Franco", h:[0.35,0.11]},
-      {n:"Gabriel Ocampo", h:[0.0,0.19]},
-      {n:"Gabriel de Bedout", h:[0.0,0.0]},
-      {n:"Godwin Zuluaga", h:[4.86,0.0]},
-      {n:"Juan Camilo Santa", h:[0.02,0.7]},
-      {n:"Juana Mendoza", h:[1.38,1.78]},
-      {n:"Julian Chamie", h:[0.0,0.0]},
-      {n:"Julian Ramirez", h:[0.0,1.08]},
-      {n:"Lucas Rodriguez", h:[1.65,2.69]},
-      {n:"Maria Alejandra Osorio", h:[6.63,0.9]},
-      {n:"Nicolas Vasquez", h:[0.86,0.01]},
-      {n:"Omar Nassar", h:[0.0,0.29]},
-      {n:"Oscar Gutierrez", h:[0.07,0.0]},
-      {n:"Salomon Peñuela", h:[4.94,0.94]},
-      {n:"Samuel Salazar", h:[0.0,0.0]},
-      {n:"Santiago Neira", h:[0.29,1.28]},
-      {n:"Simon Gomez", h:[0.0,0.0]}
+      {n:"Antonio Fonseca Bayona", h:[8.5,3.05,0.56,0.0,0.53,0.0]},
+      {n:"Emilio Escorcia", h:[1.83,0.67,0.88,2.33,0.26,0.0]},
+      {n:"Esteban Franco", h:[0.35,0.11,5.46,5.83,0.1,0.21]},
+      {n:"Gabriel Ocampo", h:[0.0,0.19,0.0,0.0,0.45,0.0]},
+      {n:"Gabriel de Bedout", h:[0.0,0.0,0.16,0.0,0.02,0.1]},
+      {n:"Godwin Zuluaga", h:[4.86,0.0,1.7,3.08,5.49,4.42]},
+      {n:"Juan Camilo Santa", h:[0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Juana Mendoza", h:[1.38,1.78,2.17,0.4,0.0,0.0]},
+      {n:"Julian Chamie", h:[0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Julian Ramirez", h:[0.0,1.08,0.39,0.79,0.0,0.39]},
+      {n:"Lucas Rodriguez", h:[1.65,2.69,0.0,0.0,0.0,2.29]},
+      {n:"Maria Alejandra Osorio", h:[6.63,0.9,0.95,1.51,0.25,0.3]},
+      {n:"Nicolas Vasquez", h:[0.86,0.01,0.65,0.16,0.89,0.04]},
+      {n:"Omar Nassar", h:[0.0,0.29,0.0,0.0,0.0,0.01]},
+      {n:"Oscar Gutierrez", h:[0.07,0.0,0.68,0.0,0.94,1.93]},
+      {n:"Salomon Peñuela", h:[4.94,0.94,6.19,1.86,0.25,0.02]},
+      {n:"Samuel Salazar", h:[0.0,0.0,0.0,0.0,0.37,0.0]},
+      {n:"Santiago Neira", h:[0.29,1.28,0.61,0.04,0.01,0.36]},
+      {n:"Simon Gomez", h:[0.0,0.0,0.0,0.0,1.75,2.96]}
     ]
   },
   agosto:{
