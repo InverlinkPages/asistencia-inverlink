@@ -174,7 +174,9 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
   </div>
   <div id="tab-fds" class="panel">
     <div class="tabs2">
-      <button class="tab2 active" onclick="swFds(this,'fds-agosto')">Agosto</button>
+      <button class="tab2 active" onclick="swFds(this,'fds-octubre')">Oct</button>
+      <button class="tab2" onclick="swFds(this,'fds-septiembre')">Sep</button>
+      <button class="tab2" onclick="swFds(this,'fds-agosto')">Agosto</button>
       <button class="tab2" onclick="swFds(this,'fds-julio')">Julio</button>
       <button class="tab2" onclick="swFds(this,'fds-junio')">Junio</button>
       <button class="tab2" onclick="swFds(this,'fds-mayo')">Mayo</button>
@@ -720,7 +722,7 @@ function swFds(btn,name){
 }
 
 // Init FDS panels
-['octubre','septiembre','agosto','julio','junio','marzo','abril','mayo'].forEach(mes=>{
+['octubre','septiembre','agosto','julio','junio','mayo','abril','marzo'].forEach(mes=>{
   document.getElementById(`fds-${mes}`).innerHTML=buildFdsPanel(mes);
 });
 setTimeout(()=>drawFdsCharts('octubre'),150);
