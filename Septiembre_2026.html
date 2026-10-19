@@ -116,8 +116,9 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
     <button class="tab active" onclick="sw(this,'resumen')">Resumen</button>
     <button class="tab" onclick="sw(this,'semanal')">Informe semanal</button>
     <button class="tab" onclick="sw(this,'calendario')">Calendario</button>
-    <button class="tab" onclick="sw(this,'fds')">FDS</button>
-    <button class="tab" onclick="sw(this,'actividad')">Actividad Diaria</button>
+    <button class="tab" onclick="sw(this,'fds')">Horas fin de semana</button>
+    <button class="tab" onclick="sw(this,'actividad')">Horas entre semana</button>
+    <button class="tab" onclick="sw(this,'totalizado')">Totalizado</button>
   </div>
 
   <div id="tab-resumen" class="panel active">
@@ -158,20 +159,18 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
     <div class="emp-grid" id="empGrid" style="display:none"></div>
   </div>
 
-  <div id="tab-actividad" class="panel">
+    <div id="tab-actividad" class="panel">
     <div class="card" style="margin-bottom:1rem">
-      <div class="card-title">Actividad M365 por día — Septiembre 2026</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:1rem">Horas de actividad digital (Teams, SharePoint, Email) por persona y día. Incluye días hábiles y fines de semana.</div>
+      <div class="card-title">Horas entre semana — Septiembre 2026</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:1rem">Actividad digital lunes a viernes (Teams, SharePoint, Email). Solo días hábiles.</div>
       <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center">
-        <span style="font-size:11px;font-weight:600;color:var(--muted)">FILTRAR:</span>
-        <button class="act-fil active" data-tipo="todos" onclick="toggleActFil(this)">Todos</button>
-        <button class="act-fil" data-tipo="habiles" onclick="toggleActFil(this)">Solo hábiles</button>
         <input type="text" id="srchAct" placeholder="Buscar persona..." style="max-width:200px" oninput="renderActividad()"/>
       </div>
-      <div style="position:relative;height:320px;margin-bottom:1.5rem"><canvas id="ch-actividad" role="img" aria-label="Actividad diaria"></canvas></div>
+      <div style="position:relative;height:320px;margin-bottom:1.5rem"><canvas id="ch-actividad" role="img" aria-label="Actividad entre semana"></canvas></div>
     </div>
     <div style="overflow-x:auto" id="tbl-actividad"></div>
   </div>
+
   <div id="tab-fds" class="panel">
     <div class="tabs2">
       <button class="tab2 active" onclick="swFds(this,'fds-octubre')">Oct</button>
@@ -228,6 +227,43 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
+  <div id="tab-totalizado" class="panel">
+    <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center">
+      <span style="font-size:11px;font-weight:600;color:var(--muted)">MES:</span>
+      <div id="mes-tot-sel" style="display:flex;gap:4px;flex-wrap:wrap"></div>
+    </div>
+    <div id="tot-kpis" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.2rem"></div>
+    <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:12px;margin-bottom:1.2rem">
+      <div class="card">
+        <div class="card-title">Entre semana vs fin de semana por persona</div>
+        <div style="display:flex;gap:12px;font-size:11px;color:var(--mid);margin-bottom:.6rem">
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2a78d6;margin-right:3px;vertical-align:middle"></span>Entre semana</span>
+          <span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#e24b4a;margin-right:3px;vertical-align:middle"></span>Fin de semana</span>
+        </div>
+        <div style="position:relative;height:240px"><canvas id="ch-tot-bars" role="img" aria-label="Barras entre semana vs fin de semana"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Distribución total</div>
+        <div style="position:relative;height:240px"><canvas id="ch-tot-donut" role="img" aria-label="Donut distribución"></canvas></div>
+        <div id="tot-donut-legend" style="display:flex;justify-content:center;gap:16px;font-size:11px;margin-top:.5rem"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.2rem">
+      <div class="card">
+        <div class="card-title">Top 5 — entre semana</div>
+        <div id="top-es"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top 5 — fin de semana</div>
+        <div id="top-fds"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Ranking completo</div>
+      <div style="overflow-x:auto" id="tbl-totalizado"></div>
+    </div>
+  </div>
 
 <script>
 const DIA_CORTE=30;
@@ -327,6 +363,7 @@ async function cargarJust(){
 
 async function sw(btn,name){
   if(name==='actividad'){setTimeout(()=>renderActividad(),100);}
+  if(name==='totalizado'){setTimeout(()=>renderTotalizado(),100);}
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   btn.classList.add('active');document.getElementById('tab-'+name).classList.add('active');
@@ -723,9 +760,11 @@ function drawFdsComp(){
       ${usaMy?`<td><span class="bdg ${fCls(my)}">${my}h</span></td>`:''}
       ${usaA?`<td><span class="bdg ${fCls(a)}">${a}h</span></td>`:''}
       ${usaM?`<td><span class="bdg ${fCls(m)}">${m}h</span></td>`:''}
-      <td style="${totStyle}">${tot}h</td></tr>`;
+      <td style="${totStyle}">${tot}h</td>
+      <td style="color:var(--mid);font-size:11px">${mesesActivos>0?+(tot/mesesActivos).toFixed(1):0}h</td></tr>`;
   }).join('');
   const thCols=[['Oct',usaOct],['Sep',usaSep],['Agosto',usaAgo],['Julio',usaJul],['Junio',usaJu],['Mayo',usaMy],['Abril',usaA],['Marzo',usaM]].filter(x=>x[1]).map(x=>`<th>${x[0]}</th>`).join('');
+  const mesesActivos=[['oct',usaOct],['sep',usaSep],['ago',usaAgo],['jul',usaJul],['jun',usaJu],['my',usaMy],['a',usaA],['m',usaM]].filter(x=>x[1]).length;
   document.getElementById('tbl-comp-fds').innerHTML=`
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:12px;color:#888">
       <span style="color:#B91C1C;font-size:14px">●</span> Persona con al menos un mes en rojo (&gt;15h) · Ordenado por total descendente
@@ -767,9 +806,9 @@ function renderActividad(){
   const ACT=getActData();
   if(!ACT)return;
   const q=(document.getElementById('srchAct')||{value:''}).value.toLowerCase();
-  const tipo=document.querySelector('.act-fil.active')?.dataset.tipo||'todos';
   const esFDS=getDiasFDS(ACT.labels);
-  const idxs=ACT.labels.map((_,i)=>i).filter(i=>tipo==='habiles'?!esFDS[i]:true);
+  // Horas entre semana: solo lun-vie (excluir FDS)
+  const idxs=ACT.labels.map((_,i)=>i).filter(i=>!esFDS[i]);
   const labels=idxs.map(i=>ACT.labels[i]);
   const users=ACT.users.filter(u=>u.n.toLowerCase().includes(q));
   const colors=['#1a1a2e','#264E84','#0D9488','#0369A1','#2E8B57','#6D28D9','#B45309','#BE185D','#047857','#7C3AED','#B91C1C','#0891B2','#65A30D','#9D174D','#1D4ED8','#0F766E','#92400E','#6B21A8','#166534'];
@@ -797,21 +836,174 @@ function renderActividad(){
     return tb-ta;
   }).map(u=>{
     const tot=+(idxs.reduce((s,i)=>s+(u.h[i]||0),0)).toFixed(1);
+    const prom=idxs.length>0?+(tot/idxs.length).toFixed(1):0;
     const cells=idxs.map(i=>{
       const h=+(u.h[i]||0).toFixed(1);
       const cls=h>10?'hrr':h>7?'hr':h>4?'ha':h>0?'hg':'h0';
       return`<td><span class="hcell ${cls}">${h>0?h:'—'}</span></td>`;
     }).join('');
-    return`<tr><td class="nm">${u.n}</td>${cells}<td style="background:var(--bg);font-weight:600">${tot}h</td></tr>`;
+    return`<tr><td class="nm">${u.n}</td>${cells}<td style="background:var(--bg);font-weight:600">${tot}h</td><td style="background:var(--bg);color:var(--mid)">${prom}h</td></tr>`;
   }).join('');
   document.getElementById('tbl-actividad').innerHTML=`<table class="fds-tbl">
-    <thead><tr><th class="nm">Persona</th>${ths}<th style="background:var(--bg)">Total</th></tr></thead>
+    <thead><tr><th class="nm">Persona</th>${ths}<th style="background:var(--bg)">Total</th><th style="background:var(--bg)">Prom/mes</th></tr></thead>
     <tbody>${rows}</tbody></table>`;
 }
 function toggleActFil(btn){
   document.querySelectorAll('.act-fil').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderActividad();
+}
+
+
+// ── TOTALIZADO ──
+const MESES_DATA = {
+  octubre:   {es:FDS_DATA.octubre_diario,   fds:FDS_DATA.octubre},
+  septiembre:{es:FDS_DATA.septiembre_diario, fds:FDS_DATA.septiembre},
+  agosto:    {es:FDS_DATA.agosto_diario,     fds:FDS_DATA.agosto},
+};
+const MESES_LABELS = {octubre:'Octubre',septiembre:'Septiembre',agosto:'Agosto'};
+let totMes = 'octubre';
+if(!MESES_DATA[totMes]?.es) totMes = Object.keys(MESES_DATA).find(k=>MESES_DATA[k]?.es) || 'agosto';
+let totChartBars=null, totChartDonut=null;
+
+function buildMesSel(){
+  const sel=document.getElementById('mes-tot-sel');
+  if(!sel)return;
+  sel.innerHTML=Object.keys(MESES_DATA).filter(k=>MESES_DATA[k]?.es).map(k=>
+    `<button onclick="selTotMes('${k}')" id="btn-tot-${k}" style="padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:0.5px solid #aaa;background:${k===totMes?'#1a1a2e':'transparent'};color:${k===totMes?'#fff':'var(--mid)'};transition:all .15s">${MESES_LABELS[k]}</button>`
+  ).join('');
+}
+
+function selTotMes(m){
+  totMes=m;
+  buildMesSel();
+  renderTotalizado();
+}
+
+function getTotData(){
+  const md=MESES_DATA[totMes];
+  if(!md||!md.es) return null;
+  const nombres=[...new Set([...md.es.users.map(u=>u.n),...(md.fds?.users||[]).map(u=>u.n)])];
+  const esFDS=getDiasFDS(md.es.labels);
+  return nombres.map(n=>{
+    const eu=md.es.users.find(u=>u.n===n);
+    const fu=md.fds?.users.find(u=>u.n===n);
+    const esH=eu?eu.h.filter((_,i)=>!esFDS[i]).reduce((s,x)=>s+x,0):0;
+    const fdsH=fu?fu.h.reduce((s,x)=>s+x,0):0;
+    const dias=eu?eu.h.filter((_,i)=>!esFDS[i]).filter(h=>h>0).length:0;
+    return{n,es:+esH.toFixed(1),fds:+fdsH.toFixed(1),tot:+(esH+fdsH).toFixed(1),dias,prom:dias>0?+(esH/dias).toFixed(1):0};
+  }).filter(d=>d.tot>0).sort((a,b)=>b.tot-a.tot);
+}
+
+function renderTotalizado(){
+  buildMesSel();
+  const data=getTotData();
+  if(!data||!data.length)return;
+
+  const totEs=+(data.reduce((s,d)=>s+d.es,0)).toFixed(1);
+  const totFds=+(data.reduce((s,d)=>s+d.fds,0)).toFixed(1);
+  const tot=+(totEs+totFds).toFixed(1);
+  const prom=data.length>0?+(data.reduce((s,d)=>s+d.prom,0)/data.length).toFixed(1):0;
+
+  const kpis=document.getElementById('tot-kpis');
+  if(kpis) kpis.innerHTML=`
+    <div style="background:var(--white);border:0.5px solid var(--line);border-radius:var(--r);padding:.9rem 1rem">
+      <div style="font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Total horas M365</div>
+      <div style="font-size:22px;font-weight:500;color:#2a78d6">${tot}h</div>
+      <div style="font-size:11px;color:var(--mid);margin-top:3px">${data.length} personas activas</div>
+    </div>
+    <div style="background:var(--white);border:0.5px solid var(--line);border-radius:var(--r);padding:.9rem 1rem">
+      <div style="font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Horas entre semana</div>
+      <div style="font-size:22px;font-weight:500;color:var(--txt)">${totEs}h</div>
+      <div style="font-size:11px;color:var(--mid);margin-top:3px">${Math.round(totEs/tot*100)}% del total</div>
+    </div>
+    <div style="background:var(--white);border:0.5px solid var(--line);border-radius:var(--r);padding:.9rem 1rem">
+      <div style="font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Horas fin de semana</div>
+      <div style="font-size:22px;font-weight:500;color:#e24b4a">${totFds}h</div>
+      <div style="font-size:11px;color:var(--mid);margin-top:3px">${Math.round(totFds/tot*100)}% del total</div>
+    </div>
+    <div style="background:var(--white);border:0.5px solid var(--line);border-radius:var(--r);padding:.9rem 1rem">
+      <div style="font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Promedio diario/persona</div>
+      <div style="font-size:22px;font-weight:500;color:var(--txt)">${prom}h</div>
+      <div style="font-size:11px;color:var(--mid);margin-top:3px">Días con actividad</div>
+    </div>`;
+
+  const names=data.map(d=>d.n.split(' ').slice(0,2).join(' '));
+  if(totChartBars) totChartBars.destroy();
+  const cvB=document.getElementById('ch-tot-bars');
+  if(cvB) totChartBars=new Chart(cvB,{
+    type:'bar',
+    data:{labels:names,datasets:[
+      {label:'Entre semana',data:data.map(d=>d.es),backgroundColor:'#2a78d6',borderRadius:2,borderSkipped:false},
+      {label:'Fin de semana',data:data.map(d=>d.fds),backgroundColor:'#e24b4a',borderRadius:2,borderSkipped:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.raw}h`}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:9},autoSkip:false,maxRotation:45}},
+        y:{grid:{color:'rgba(128,128,128,0.1)'},ticks:{font:{size:10},callback:v=>v+'h'}}}}
+  });
+
+  if(totChartDonut) totChartDonut.destroy();
+  const cvD=document.getElementById('ch-tot-donut');
+  if(cvD) totChartDonut=new Chart(cvD,{
+    type:'doughnut',
+    data:{labels:['Entre semana','Fin de semana'],datasets:[{
+      data:[totEs,totFds],backgroundColor:['#2a78d6','#e24b4a'],
+      borderWidth:2,borderColor:'#fff'
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw}h (${Math.round(c.raw/tot*100)}%)`}}}}
+  });
+
+  const leg=document.getElementById('tot-donut-legend');
+  if(leg) leg.innerHTML=`
+    <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mid)"><span style="width:10px;height:10px;border-radius:2px;background:#2a78d6"></span>Entre semana ${Math.round(totEs/tot*100)}%</span>
+    <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--mid)"><span style="width:10px;height:10px;border-radius:2px;background:#e24b4a"></span>Fin de semana ${Math.round(totFds/tot*100)}%</span>`;
+
+  const topN=5;
+  const topEs=[...data].sort((a,b)=>b.es-a.es).slice(0,topN);
+  const topFds=[...data].sort((a,b)=>b.fds-a.fds).slice(0,topN);
+  const maxEs=topEs[0]?.es||1; const maxFds=topFds[0]?.fds||1;
+  const mkTop=(arr,key,color,max)=>arr.map((d,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--line)">
+      <span style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;background:var(--bg);color:var(--mid)">${i+1}</span>
+      <span style="flex:1;font-size:12px;color:var(--txt)">${d.n.split(' ').slice(0,2).join(' ')}</span>
+      <div style="background:var(--line);border-radius:4px;height:5px;width:70px;display:inline-block;vertical-align:middle;margin-right:4px"><div style="height:5px;border-radius:4px;background:${color};width:${Math.round(d[key]/max*100)}%"></div></div>
+      <span style="font-size:12px;font-weight:500;min-width:38px;text-align:right;color:var(--txt)">${d[key]}h</span>
+    </div>`).join('');
+  const elEs=document.getElementById('top-es');
+  const elFds=document.getElementById('top-fds');
+  if(elEs) elEs.innerHTML=mkTop(topEs,'es','#2a78d6',maxEs);
+  if(elFds) elFds.innerHTML=mkTop(topFds,'fds','#e24b4a',maxFds);
+
+  const rows=data.map((d,i)=>{
+    const pPct=tot>0?Math.round(d.fds/d.tot*100):0;
+    const cls=pPct>20?'color:#a32d2d;background:#fcebeb':pPct>10?'color:#854f0b;background:#faeeda':'color:#0f6e56;background:#e1f5ee';
+    const lbl=pPct>20?'Alto FDS':pPct>10?'Moderado':'Normal';
+    return`<tr>
+      <td style="padding:6px 10px"><span style="width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px;background:var(--bg);color:var(--mid)">${i+1}</span></td>
+      <td style="padding:6px 10px;font-weight:500">${d.n}</td>
+      <td style="padding:6px 10px;text-align:right">${d.es}h</td>
+      <td style="padding:6px 10px;text-align:right;color:var(--mid)">${d.prom}h</td>
+      <td style="padding:6px 10px;text-align:right">${d.fds}h</td>
+      <td style="padding:6px 10px;text-align:right">${pPct}%</td>
+      <td style="padding:6px 10px;text-align:right;font-weight:500">${d.tot}h</td>
+      <td style="padding:6px 10px;text-align:right"><span style="display:inline-flex;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:500;${cls}">${lbl}</span></td>
+    </tr>`;
+  }).join('');
+  const tbl=document.getElementById('tbl-totalizado');
+  if(tbl) tbl.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px">
+    <thead><tr style="border-bottom:0.5px solid var(--line)">
+      <th style="padding:6px 10px;font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase">#</th>
+      <th style="padding:6px 10px;font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;text-align:left">Persona</th>
+      <th style="padding:6px 10px;font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;text-align:right">Entre semana</th>
+      <th style="padding:6px 10px;font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;text-align:right">Prom/día</th>
+      <th style="padding:6px 10px;font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;text-align:right">Fin semana</th>
+      <th style="padding:6px 10px;font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;text-align:right">% FDS</th>
+      <th style="padding:6px 10px;font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;text-align:right">Total</th>
+      <th style="padding:6px 10px;font-size:10px;font-weight:500;color:var(--mid);text-transform:uppercase;text-align:right">Estado</th>
+    </tr></thead>
+    <tbody>${rows}</tbody></table>`;
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarModal();});
