@@ -230,7 +230,7 @@ td{padding:10px 14px;border-bottom:1px solid var(--line)}tr:hover td{background:
 <div class="toast" id="toast"></div>
 
 <script>
-const DIA_CORTE=18;
+const DIA_CORTE=19;
 const SUPABASE_URL="https://jztiojajhwwdvwwytpcc.supabase.co";
 const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp6dGlvamFqaHd3ZHZ3d3l0cGNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAwNjU4NTAsImV4cCI6MjA5NTY0MTg1MH0.LYEAV_N77xTbN_QsvbHXfoOJTSmM0QH7tq78yaxjisg";
 const MES=10,ANIO=2026,DOW_INICIO=3,DIAS_MES=31;
@@ -511,6 +511,30 @@ const FDS_DATA = {
     ]
   }
 ,
+  octubre_diario:{
+    labels:["1-Oct","2-Oct","3-Oct","4-Oct","5-Oct","6-Oct","7-Oct","8-Oct","9-Oct","10-Oct","11-Oct","12-Oct","13-Oct","14-Oct","15-Oct","16-Oct","17-Oct","18-Oct","19-Oct"],
+    users:[
+      {n:"Antonio Fonseca Bayona", h:[0.0,1.5,2.69,4.97,10.91,12.22,14.24,10.51,7.6,3.74,0.24,2.7,10.18,8.58,8.96,9.22,0.0,0.0,0.0]},
+      {n:"Emilio Escorcia", h:[0.0,0.1,0.3,2.88,8.65,8.15,8.6,7.93,11.99,2.84,0.87,1.76,9.17,7.19,9.12,7.62,0.08,0.63,0.0]},
+      {n:"Esteban Franco", h:[0.0,0.0,2.47,1.1,7.62,10.56,10.55,9.99,7.76,0.18,0.01,5.7,8.76,6.24,7.4,4.73,0.73,1.07,0.0]},
+      {n:"Gabriel Ocampo", h:[0.0,1.18,2.75,3.26,8.08,10.18,7.58,9.61,4.43,0.4,0.0,1.63,11.18,12.37,10.62,7.43,0.73,0.01,0.0]},
+      {n:"Gabriel de Bedout", h:[0.0,0.0,0.0,0.0,0.0,0.12,0.0,0.32,0.0,0.0,0.0,0.0,0.23,0.0,0.19,0.0,0.0,0.0,0.0]},
+      {n:"Godwin Zuluaga", h:[0.0,0.0,0.0,0.0,9.11,7.2,8.17,3.31,3.05,0.0,0.0,0.34,8.38,6.94,6.99,4.51,0.26,0.0,0.0]},
+      {n:"Juan Camilo Santa", h:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Juana Mendoza", h:[0.0,0.0,0.0,1.67,9.68,11.47,8.46,10.6,10.65,0.82,0.01,0.31,9.16,7.74,8.82,5.57,0.4,0.13,0.0]},
+      {n:"Julian Chamie", h:[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},
+      {n:"Julian Ramirez", h:[0.0,0.19,0.0,1.07,7.93,7.17,3.06,8.03,3.17,0.17,0.51,0.92,6.47,6.56,7.52,2.07,0.12,0.2,0.0]},
+      {n:"Lucas Rodriguez", h:[0.0,0.0,0.0,0.0,4.73,5.38,7.49,7.71,4.74,0.0,0.0,0.0,8.95,8.7,6.59,3.23,0.28,0.0,0.0]},
+      {n:"Maria Alejandra Osorio", h:[0.0,0.21,0.38,0.0,9.43,7.13,10.85,8.74,7.0,0.0,0.0,0.22,10.42,10.76,13.38,8.86,0.12,0.0,0.0]},
+      {n:"Nicolas Vasquez", h:[0.0,0.39,1.44,0.71,9.49,8.3,7.62,9.03,6.32,0.0,0.17,1.62,9.84,4.8,9.82,12.46,0.77,0.65,0.0]},
+      {n:"Omar Nassar", h:[0.0,0.0,0.01,0.43,6.4,6.34,4.2,1.99,3.52,0.0,0.07,0.35,8.66,8.05,6.6,1.27,0.34,1.63,0.0]},
+      {n:"Oscar Gutierrez", h:[0.0,0.24,0.1,0.32,9.16,7.94,6.98,6.97,3.78,0.0,0.14,1.01,9.64,10.12,10.5,3.51,0.3,0.03,0.0]},
+      {n:"Salomon Peñuela", h:[0.0,0.44,0.01,1.11,10.0,11.26,9.17,10.56,9.71,3.04,0.07,6.85,9.35,10.88,9.46,7.45,2.22,0.1,0.0]},
+      {n:"Samuel Salazar", h:[0.0,0.0,0.0,1.91,9.46,11.88,7.82,7.04,8.28,0.01,0.73,1.25,9.69,8.55,9.0,6.85,0.23,0.37,0.0]},
+      {n:"Santiago Neira", h:[0.0,0.94,0.0,0.25,9.95,11.54,11.81,10.12,6.8,0.0,0.0,2.31,11.09,11.26,11.98,7.92,0.25,0.0,0.0]},
+      {n:"Simon Gomez", h:[0.0,1.2,0.0,5.75,9.08,8.43,11.64,11.26,6.59,0.0,1.7,0.75,9.26,11.39,8.19,10.76,2.46,0.12,0.0]}
+    ]
+  },
   septiembre_diario:{
     labels:["1-Sep","2-Sep","3-Sep","4-Sep","5-Sep","6-Sep","7-Sep","8-Sep","9-Sep","10-Sep","11-Sep","12-Sep","13-Sep","14-Sep","15-Sep","16-Sep","17-Sep","18-Sep","19-Sep","20-Sep","21-Sep","22-Sep","23-Sep","24-Sep","25-Sep","26-Sep","27-Sep","28-Sep","29-Sep","30-Sep"],
     users:[
@@ -731,8 +755,10 @@ setTimeout(()=>drawFdsCharts('octubre'),150);
 // ── ACTIVIDAD DIARIA ──
 let actChart=null;
 function getActData(){
-  const isSep=(document.querySelector('.header h1')?.textContent||'').includes('Septiembre');
-  return isSep?FDS_DATA.septiembre_diario:FDS_DATA.agosto_diario;
+  const title=(document.querySelector('.header h1')?.textContent||'');
+  if(title.includes('Octubre')) return FDS_DATA.octubre_diario||FDS_DATA.agosto_diario;
+  if(title.includes('Septiembre')) return FDS_DATA.septiembre_diario||FDS_DATA.agosto_diario;
+  return FDS_DATA.agosto_diario;
 }
 function getDiasFDS(fechas){
   return fechas.map((f,i)=>{const d=new Date(f+'T12:00:00');return d.getDay()===0||d.getDay()===6;});
